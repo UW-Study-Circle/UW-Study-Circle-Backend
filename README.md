@@ -5,7 +5,7 @@
  ```
  - Create virtualenv folder
  ```bash
-python3 -m venv en
+python3 -m venv env
  ```
  Activate Virtualenv
  ```bash
