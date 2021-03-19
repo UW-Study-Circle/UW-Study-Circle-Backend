@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(100))
     firstname = db.Column(db.String(1000))
     lastname = db.Column(db.String(1000))
+<<<<<<< HEAD
     gender = db.Column(db.String(1000))
     bday = db.Column(db.String(1000))
     phonenumber = db.Column(db.String(100), nullable=True)
@@ -69,3 +70,8 @@ class GroupSchema(Schema):
     status = fields.Str()
     def format_name(self, group):
         return "{}".format(group.groupname)
+=======
+    gender = db.Column(db.Enum('MALE','FEMALE', 'OTHER')
+    birthday = db.Column(db.Date)
+    phonenumber = db.Column(db.String(100), nullable=True)
+>>>>>>> d62a3bf (Updated signup for main, init.py, models.py)
