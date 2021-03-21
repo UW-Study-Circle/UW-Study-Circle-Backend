@@ -3,14 +3,19 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager 
+from datetime import timedelta
+import os
+
 
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
 
 app = Flask(__name__)
 
+
 app.config['SECRET_KEY'] = '9OLWxND4o83j4K4iuopO'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite' 
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(seconds=1800)
 
 db.init_app(app)
 with app.app_context():
