@@ -1,9 +1,9 @@
 # init.py
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager 
 from datetime import timedelta
+from flask_mail import Mail
 import os
 
 
@@ -16,10 +16,17 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '9OLWxND4o83j4K4iuopO'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite' 
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(seconds=1800)
+app.config['MAIL_SERVER'] = 'smtp.126.com'#.office365.com'
+app.config['MAIL_PORT'] = 465 #587
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'yyt_2008@126.com'#os.environ.get('EMAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = '150724yan'#os.environ.get('EMAIL_PASSWORD')
+mail = Mail(app)
 
 db.init_app(app)
 with app.app_context():
     db.create_all()
+    
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'

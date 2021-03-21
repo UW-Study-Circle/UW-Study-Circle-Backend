@@ -1,10 +1,12 @@
 # auth.py
 import re
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from models import User
-from server import db
+from server import db, app, mail
+from threading import Thread
+from flask_mail import Message
 
 
 auth = Blueprint('auth', __name__)
@@ -65,9 +67,9 @@ def signup_post():
         flash('name already exists')
         return redirect(url_for('auth.signup'))
     
-    if not email_match: # if the email is wrong, we want to redirect back to signup page so user can try again  
-        flash('Please register with UW-Madison email')
-        return redirect(url_for('auth.signup'))
+    # if not email_match: # if the email is wrong, we want to redirect back to signup page so user can try again  
+    #     flash('Please register with UW-Madison email')
+    #     return redirect(url_for('auth.signup'))
     
     if confirm_password != password: # if password and confirmed password do't match, return to sign up page
         flash('Confirmed password does not match')
@@ -101,3 +103,58 @@ def signup_post():
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+def send_email(user):
+    token = user.get_reset_token()
+    print(token)
+    msg = Message()
+    msg.subject = "UW-Study-Circle Password Reset"
+    msg.sender = app.config['MAIL_USERNAME']
+    msg.recipients = [user.email]
+    print(user.email)
+    msg.html = render_template('reset_password_email.html', user=user, token=token)
+    # Thread(target=send_async_email, args=(app._get_current_object(), msg)).start()
+    # mail.send(msg)
+    with app.app_context():
+        mail.send(msg)
+
+@auth.route('/reset_password', methods=['POST', 'GET'])
+def reset_request():
+    # print("go to email")
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flash('Email is not regisited')
+            return redirect(url_for('auth.reset_request'))
+        
+        send_email(user)
+        flash('Please check your emailbox and click the link to reset')
+        # print(user.email)
+    # return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
+    return render_template('reset_password_request.html')
+
+@auth.route('/reset_password/<token>', methods=['POST', 'GET'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    user = User.verify_reset_token(token)
+    if not user:
+        flash('That is an invalid or expired token', 'warning')
+        return redirect(url_for('auth.reset_request'))
+    if request.method == 'POST':
+        password = request.form.get('password')
+        user.password = generate_password_hash(password, method='sha256')
+        db.session.commit()
+        flash('Password is reset')
+    
+        return redirect(url_for('auth.login'))
+    return render_template('reset_password.html', title='reset password')

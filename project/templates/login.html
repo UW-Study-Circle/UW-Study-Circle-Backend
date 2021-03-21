@@ -33,6 +33,10 @@
                     Remember me
                 </label>
             </div>
+            <div>
+                <p>Create new accout<a href="{{ url_for('auth.signup') }}">Go to signup！</a></p>
+                <p>Forget password？<a href="{{ url_for('auth.reset_request') }}">Reset Password</a></p>
+            </div>
             <button class="button is-block is-info is-large is-fullwidth">Login</button>
         </form>
     </div>
