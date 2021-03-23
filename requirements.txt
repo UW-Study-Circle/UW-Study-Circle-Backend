@@ -1,3 +1,8 @@
 Flask
 flask-sqlalchemy
 flask-login
+flask-restful
+flask-mail
+PyJWT
+marshmallow
+marshmallow-jsonapi

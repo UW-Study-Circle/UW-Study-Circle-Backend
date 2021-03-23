@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from server import db, app
 import jwt
 from time import time
+from marshmallow import Schema, fields
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
@@ -27,3 +28,13 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(user_id)
 
+
+class UserSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str()
+    email = fields.Str()
+    password = fields.Str()
+    formatted_name = fields.Method("format_name", dump_only=True)
+
+    def format_name(self, user):
+        return "{}".format(user.name)
