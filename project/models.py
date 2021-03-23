@@ -28,6 +28,15 @@ class Group(UserMixin, db.Model):
     duration = db.Column(db.Integer)
     status = db.Column(db.String(100))
 
+class Group(UserMixin, db.Model):
+    groupname = db.Column(db.String(1000))
+    groupid = db.Column(db.Integer, primary_key=True)
+    courseInfo = db.Column(db.String(1000))
+    level = db.Column(db.Enum('Beginner','Intermediate', 'Advanced')
+    description = db.Column(db.String(2000))
+    capacity = db.Column(db.Integer)
+    duration = db.Column(db.Integer)
+    groupStatus = db.Column(db.Enum('Public','Private')
     def get_reset_token(self, expires=600):
         return jwt.encode({'reset_password': self.id, 'exp': time() + expires},
                           app.config['SECRET_KEY'],
