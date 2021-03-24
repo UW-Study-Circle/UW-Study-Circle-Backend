@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     firstname = db.Column(db.String(1000))
     lastname = db.Column(db.String(1000))
     gender = db.Column(db.Enum('MALE','FEMALE', 'OTHER')
-    birthday = db.Column(db.DateTime)
+    bday = db.Column(db.Date)
     phonenumber = db.Column(db.String(100), nullable=True)
     name = db.Column(db.String(1000))
 
