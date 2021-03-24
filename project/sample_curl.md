@@ -8,7 +8,7 @@ curl -d '{
     "lastname": "Akshat",
     "firstname": "Sinha",
     "gender": "Male",
-    "phonenumber": "123456789",
+    "phone": "123456789",
     "bday": "28-01-1995"
     }' -H 'Content-Type: application/json' 127.0.0.1:6969/api/user/
 ```
