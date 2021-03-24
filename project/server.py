@@ -7,6 +7,7 @@ from flask_restful import Api
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
+from flask_login import LoginManager 
 import os
 
 
@@ -43,6 +44,14 @@ from models import User
 with app.app_context():
     db.create_all()
     
+login_manager = LoginManager()
+# login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    # since the user_id is just the primary key of our user table, use it in the query for the user
+    return User.query.get(int(user_id))
 
 from api import *
 
@@ -52,7 +61,7 @@ api.add_resource(HelloAPI, '/', endpoint="helloapi")
 docs.register(HelloAPI)
 
 api.add_resource(UserAPI, '/api/user/', endpoint="create_user", methods=['POST'])
-api.add_resource(UserAPI, '/api/user/email/<email>', endpoint="search_user", methods=['GET'])
+api.add_resource(UserAPI, '/api/user/email/<email>/password/<password>', endpoint="search_user", methods=['GET'])
 api.add_resource(UserAPI, '/api/user/id/<id>', endpoint="delete_user", methods=['DELETE'])
 
 docs.register(UserAPI, endpoint="create_user")
