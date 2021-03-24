@@ -15,6 +15,9 @@ class HelloAPI(MethodResource, Resource):
         '''
         Get method represents a Hello World GET API method
         '''
+        if current_user.is_authenticated:
+            print(current_user)
+            return user_schema.dump(current_user)
         return {'hello': 'world'}
 
 class UserAPI(MethodResource, Resource):
