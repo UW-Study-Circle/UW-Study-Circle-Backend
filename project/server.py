@@ -27,14 +27,6 @@ app.config.update({
     'APISPEC_SWAGGER_UI_URL': '/swagger-ui/'  # URI to access UI of API Doc
 })
 
-# app.config['APISPEC_SPEC'] =  APISpec(
-#         title='Awesome Project',
-#         version='v1',
-#         plugins=[MarshmallowPlugin()],
-#         openapi_version='2.0.0'
-#     )
-# app.config['APISPEC_SWAGGER_URL'] = '/swagger/',  # URI to access API Doc JSON 
-# app.config['APISPEC_SWAGGER_UI_URL'] = '/swagger-ui/'  # URI to access UI of API Doc
 app.config['SECRET_KEY'] = '9OLWxND4o83j4K4iuopO'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite' 
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(seconds=1800)
