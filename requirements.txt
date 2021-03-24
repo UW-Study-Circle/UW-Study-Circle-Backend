@@ -6,3 +6,4 @@ flask-mail
 PyJWT
 marshmallow
 marshmallow-jsonapi
+flask-apispec
