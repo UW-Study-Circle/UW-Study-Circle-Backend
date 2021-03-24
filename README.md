@@ -32,8 +32,8 @@ from models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app.app_context().push()
-user1 = User(name='Peter', email='peter@e.c', password=generate_password_hash('p'))
-user2 = User(name='Ash', email='ash@e.c', password=generate_password_hash('a'))
+user1 = User(username='Peter', email='peter@e.c', password=generate_password_hash('p'))
+user2 = User(username='Ash', email='ash@e.c', password=generate_password_hash('a'))
 
 db.session.add(user1)
 db.session.add(user2)
