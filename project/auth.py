@@ -67,9 +67,9 @@ def signup_post():
         flash('name already exists')
         return redirect(url_for('auth.signup'))
     
-    # if not email_match: # if the email is wrong, we want to redirect back to signup page so user can try again  
-    #     flash('Please register with UW-Madison email')
-    #     return redirect(url_for('auth.signup'))
+    if not email_match: # if the email is wrong, we want to redirect back to signup page so user can try again  
+        flash('Please register with UW-Madison email')
+        return redirect(url_for('auth.signup'))
     
     if confirm_password != password: # if password and confirmed password do't match, return to sign up page
         flash('Confirmed password does not match')
@@ -108,19 +108,38 @@ def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)
 
-def send_email(user):
-    token = user.get_reset_token()
+# def send_email(user):
+#     token = user.get_token()
+#     print(token)
+#     msg = Message()
+#     msg.subject = "UW-Study-Circle Password Reset"
+#     msg.sender = app.config['MAIL_USERNAME']
+#     msg.recipients = [user.email]
+#     print(user.email)
+#     msg.html = render_template('reset_password_email.html', user=user, token=token)
+#     # Thread(target=send_async_email, args=(app._get_current_object(), msg)).start()
+#     # mail.send(msg)
+#     with app.app_context():
+#         mail.send(msg)
+        
+def send_email(user, usage):
+    token = user.get_token()
     print(token)
     msg = Message()
-    msg.subject = "UW-Study-Circle Password Reset"
+    if usage == "reset password":
+        msg.subject = "UW-Study-Circle Password Reset"
+    else:
+        msg.subject = "UW-Study-Circle Registeration"
     msg.sender = app.config['MAIL_USERNAME']
     msg.recipients = [user.email]
-    print(user.email)
-    msg.html = render_template('reset_password_email.html', user=user, token=token)
+    if usage == "reset password":
+        msg.html = render_template('reset_password_email.html', user=user, token=token)
+    else:
+        msg.html = render_template('signup_email.html', user=user, token=token)
     # Thread(target=send_async_email, args=(app._get_current_object(), msg)).start()
     # mail.send(msg)
     with app.app_context():
-        mail.send(msg)
+        mail.send(msg)        
 
 @auth.route('/reset_password', methods=['POST', 'GET'])
 def reset_request():
@@ -134,7 +153,7 @@ def reset_request():
             flash('Email is not regisited')
             return redirect(url_for('auth.reset_request'))
         
-        send_email(user)
+        send_email(user, "reset password")
         flash('Please check your emailbox and click the link to reset')
         # print(user.email)
     # return redirect(url_for('login'))
@@ -146,7 +165,7 @@ def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     
-    user = User.verify_reset_token(token)
+    user = User.verify_token(token)
     if not user:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('auth.reset_request'))
