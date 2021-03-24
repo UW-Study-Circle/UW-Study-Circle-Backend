@@ -4,6 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
 from flask_mail import Mail
 from flask_restful import Api
+from apispec import APISpec
+from apispec.ext.marshmallow import MarshmallowPlugin
+from flask_apispec.extension import FlaskApiSpec
+from flask_login import LoginManager 
 import os
 
 
@@ -13,6 +17,16 @@ db = SQLAlchemy()
 
 app = Flask(__name__)
 
+app.config.update({
+    'APISPEC_SPEC': APISpec(
+        title='UW Study-Circle',
+        version='v1',
+        plugins=[MarshmallowPlugin()],
+        openapi_version='2.0.0'
+    ),
+    'APISPEC_SWAGGER_URL': '/swagger/',  # URI to access API Doc JSON
+    'APISPEC_SWAGGER_UI_URL': '/swagger-ui/'  # URI to access UI of API Doc
+})
 
 app.config['SECRET_KEY'] = '9OLWxND4o83j4K4iuopO'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite' 
@@ -30,12 +44,26 @@ from models import User
 with app.app_context():
     db.create_all()
     
+login_manager = LoginManager()
+# login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    # since the user_id is just the primary key of our user table, use it in the query for the user
+    return User.query.get(int(user_id))
 
 from api import *
 
+docs = FlaskApiSpec(app)
 api = Api(app)
-api.add_resource(HelloAPI, '/')
-api.add_resource(UserAPI, '/api/user/', endpoint="create_user")
-api.add_resource(UserAPI, '/api/user/email/<email>', endpoint="search_user")
-api.add_resource(UserAPI, '/api/user/id/<id>', endpoint="delete_user")
+api.add_resource(HelloAPI, '/', endpoint="helloapi")
+docs.register(HelloAPI)
 
+api.add_resource(UserAPI, '/api/user/', endpoint="create_user", methods=['POST'])
+api.add_resource(UserAPI, '/api/user/email/<email>/password/<password>', endpoint="search_user", methods=['GET'])
+api.add_resource(UserAPI, '/api/user/id/<id>', endpoint="delete_user", methods=['DELETE'])
+
+docs.register(UserAPI, endpoint="create_user")
+docs.register(UserAPI, endpoint="search_user")
+docs.register(UserAPI, endpoint="delete_user")
