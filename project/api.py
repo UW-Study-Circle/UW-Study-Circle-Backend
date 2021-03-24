@@ -4,8 +4,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_apispec import doc, use_kwargs, marshal_with
 from flask_apispec.views import MethodResource
 
+<<<<<<< HEAD
 from models import User, UserSchema
 user_schema = UserSchema()
+=======
+from models import User, UserSchema, Group, GroupSchema
+user_schema = UserSchema()
+group_schema = GroupSchema()
+>>>>>>> e65f39f (Updated models and api.py)
 
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -108,4 +114,66 @@ class UserAPI(MethodResource, Resource):
         db.session.commit()
         result["Success"] = "User deleted"
         # print(type(result))
+<<<<<<< HEAD
+=======
+        return jsonify(result)
+
+class GroupAPI(Resource):
+    def post(self):
+        body = request.get_json()
+        if body is None:
+            return jsonify({"Error": "Data not in correct format"})
+        print(body)
+        
+        result = dict()
+        try:
+            groupname = body["groupname"]
+            groupid = body["groupid"]
+            courseinfo = body["courseinfo"]
+            level = body["level"]
+            description = body["description"]
+            capacity = body["capacity"]
+            duration = body["duration"]
+            status = body["status"]         
+                
+            groupname_exist = Group.query.filter_by(groupname=groupname).first() 
+            if groupname_exist:
+                result["Duplicate"] = "Group Name already exists"
+                return jsonify(result)   
+            new_group = Group(
+                groupname=groupname, groupid=groupid, courseinfo=courseinfo, level=level, description=description,
+                capacity=capacity, duration=duration, status=status)
+            # add the new group to the database
+            from server import db
+
+            db.session.add(new_group)
+            db.session.commit()
+            result["Success"] = "Group created"
+            return jsonify(result)
+            
+        except Exception as e:
+            error = dict()
+            error["Error"] = str(e)
+            return jsonify(error)
+
+    def get(self, groupname):
+        group = Group.query.filter_by(groupname=groupname).first()
+        result = dict()
+        if group is None:
+            return {"Content": None}
+
+        result["Content"] = group_schema.dump(group)
+        # print(type(result))
+        return jsonify(result)
+
+    def delete(self, id):
+        group = Group.query.filter_by(groupid=groupid).first()
+        result = dict()
+        if group is None:
+            return {"Content": "Group not found"}
+
+        Group.query.filter_by(groupid=groupid).delete()
+        result["Success"] = "Group deleted"
+        # print(type(result))
+>>>>>>> e65f39f (Updated models and api.py)
         return jsonify(result)
