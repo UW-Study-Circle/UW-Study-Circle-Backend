@@ -101,6 +101,8 @@ class UserAPI(MethodResource, Resource):
             return {"Content": "User not found"}
 
         User.query.filter_by(id=id).delete()
+        from server import db
+        db.session.commit()
         result["Success"] = "User deleted"
         # print(type(result))
         return jsonify(result)
