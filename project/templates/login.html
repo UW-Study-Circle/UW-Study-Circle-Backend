@@ -16,9 +16,11 @@
         <form method="POST" action="/login">
             <div class="field">
                 <div class="control">
-                    <input class="input is-large" type="email" name="email" placeholder="Your Email" autofocus="">
+                    <input class="input is-large" type="text" name="name" placeholder="Your Email" autofocus="">
                 </div>
             </div>
+            
+          
 
             <div class="field">
                 <div class="control">
@@ -30,6 +32,10 @@
                     <input type="checkbox">
                     Remember me
                 </label>
+            </div>
+            <div>
+                <p>Create new accout<a href="{{ url_for('auth.signup') }}">Go to signup！</a></p>
+                <p>Forget password？<a href="{{ url_for('auth.reset_request') }}">Reset Password</a></p>
             </div>
             <button class="button is-block is-info is-large is-fullwidth">Login</button>
         </form>
