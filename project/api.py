@@ -8,20 +8,19 @@ from models import User, UserSchema, Group, GroupSchema
 user_schema = UserSchema()
 group_schema = GroupSchema()
 
+
+from flask_login import login_user, logout_user, login_required, current_user
+
 class ProfileAPI(MethodResource, Resource):
     @doc(description='User Profile API.', tags=['User-Profile'])
     def get(self):
         '''
         Get method to fetch logged-in user's profile
         '''
-<<<<<<< HEAD
-        return {'hello': 'world'}
-=======
         if current_user.is_authenticated:
             print(current_user)
             return user_schema.dump(current_user)
         return {'Error': 'Unauthenticated'}
->>>>>>> add profile api
 
 class UserAPI(MethodResource, Resource):
     @doc(description='Post request for signup feature.', tags=['User'])
