@@ -9,16 +9,16 @@ user_schema = UserSchema()
 
 from flask_login import login_user, logout_user, login_required, current_user
 
-class HelloAPI(MethodResource, Resource):
-    @doc(description='Hello World API.', tags=['Hello-World'])
+class ProfileAPI(MethodResource, Resource):
+    @doc(description='User Profile API.', tags=['User-Profile'])
     def get(self):
         '''
-        Get method represents a Hello World GET API method
+        Get method to fetch logged-in user's profile
         '''
         if current_user.is_authenticated:
             print(current_user)
             return user_schema.dump(current_user)
-        return {'hello': 'world'}
+        return {'Error': 'Unauthenticated'}
 
 class UserAPI(MethodResource, Resource):
     @doc(description='Post request for signup feature.', tags=['User'])
