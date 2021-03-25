@@ -8,6 +8,7 @@ from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 from flask_login import LoginManager 
+from flask_cors import CORS
 import os
 
 
@@ -57,6 +58,7 @@ from api import *
 
 docs = FlaskApiSpec(app)
 api = Api(app)
+CORS(app)
 api.add_resource(ProfileAPI, '/', endpoint="profile")
 docs.register(ProfileAPI, endpoint="profile")
 
