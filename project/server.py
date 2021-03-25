@@ -57,8 +57,8 @@ from api import *
 
 docs = FlaskApiSpec(app)
 api = Api(app)
-api.add_resource(HelloAPI, '/', endpoint="helloapi")
-docs.register(HelloAPI)
+api.add_resource(ProfileAPI, '/', endpoint="profile")
+docs.register(ProfileAPI, endpoint="profile")
 
 api.add_resource(UserAPI, '/api/user/', endpoint="create_user", methods=['POST'])
 api.add_resource(UserAPI, '/api/user/email/<email>/password/<password>', endpoint="search_user", methods=['GET'])

@@ -8,13 +8,20 @@ from models import User, UserSchema, Group, GroupSchema
 user_schema = UserSchema()
 group_schema = GroupSchema()
 
-class HelloAPI(MethodResource, Resource):
-    @doc(description='Hello World API.', tags=['Hello-World'])
+class ProfileAPI(MethodResource, Resource):
+    @doc(description='User Profile API.', tags=['User-Profile'])
     def get(self):
         '''
-        Get method represents a Hello World GET API method
+        Get method to fetch logged-in user's profile
         '''
+<<<<<<< HEAD
         return {'hello': 'world'}
+=======
+        if current_user.is_authenticated:
+            print(current_user)
+            return user_schema.dump(current_user)
+        return {'Error': 'Unauthenticated'}
+>>>>>>> add profile api
 
 class UserAPI(MethodResource, Resource):
     @doc(description='Post request for signup feature.', tags=['User'])
