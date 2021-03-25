@@ -22,9 +22,7 @@ class ProfileAPI(MethodResource, Resource):
             return jsonResult
 
         jsonResult = jsonify({'hello': 'world'})
-        ############## Added access control for front end by Karan ##################
-        jsonResult.headers.add('Access-Control-Allow-Origin', '*')
-        jsonResult.header('Access-Control-Allow-Headers', "*")
+        
         return jsonResult
 
 class UserAPI(MethodResource, Resource):
@@ -39,9 +37,7 @@ class UserAPI(MethodResource, Resource):
 
         if body is None:
             jsonResult = jsonify({"Error": "Data not in correct format"})
-            ############## Added access control for front end by Karan ##################
-            jsonResult.headers.add('Access-Control-Allow-Origin', '*')
-            jsonResult.header('Access-Control-Allow-Headers', "*")
+            
             return jsonResult
         print(body)
         
@@ -64,19 +60,16 @@ class UserAPI(MethodResource, Resource):
                 result["Duplicate"] = "Email already exists"
                 ############## Added access control for front end by Karan ##################
                 jsonResult = jsonify(result)
-                jsonResult.headers.add('Access-Control-Allow-Origin',
-                                       '*')
-                jsonResult.header('Access-Control-Allow-Headers', "*")
+                #jsonResult.headers.add('Access-Control-Allow-Origin',
+                #                       '*')
+                #jsonResult.headers.add('Access-Control-Allow-Headers', "*")
                 return jsonResult
 
             if name_exist:
                 result["Duplicate"] = "Name already exists"
 
-                ############## Added access control for front end by Karan ##################
                 jsonResult = jsonify(result)
-                jsonResult.headers.add('Access-Control-Allow-Origin',
-                                   '*')
-                jsonResult.header('Access-Control-Allow-Headers', "*")
+                
                 return jsonResult 
             new_user = User(
                 email=email, username=username, password=generate_password_hash(password, method='sha256'),
@@ -88,11 +81,8 @@ class UserAPI(MethodResource, Resource):
             db.session.commit()
             result["Success"] = "User created"
             
-            ############## Added access control for front end by Karan ##################
             jsonResult = jsonify(result)
-            jsonResult.headers.add('Access-Control-Allow-Origin',
-                                   '*')
-            jsonResult.header('Access-Control-Allow-Headers', "*")
+            
             return jsonResult
             
 
@@ -100,11 +90,8 @@ class UserAPI(MethodResource, Resource):
             error = dict()
             error["Error"] = str(e)
 
-            ############## Added access control for front end by Karan ##################
             jsonError = jsonify(error)
-            jsonError.headers.add('Access-Control-Allow-Origin',
-                                   '*')
-            jsonError.header('Access-Control-Allow-Headers', "*")
+            
             return jsonError
 
     @doc(description='Get request for login feature.', tags=['User'])
@@ -115,11 +102,8 @@ class UserAPI(MethodResource, Resource):
         user = User.query.filter_by(email=email).first()
         if not user or not check_password_hash(user.password, password): 
 
-            ############## Added access control for front end by Karan ##################
             jsonError = jsonify({"Content": None})
-            jsonError.headers.add('Access-Control-Allow-Origin',
-                                  '*')
-            jsonError.header('Access-Control-Allow-Headers', "*")
+            
             return jsonError # if user doesn't exist or password is wrong, reload the page
 
         # if the above check passes, then we know the user has the right credentials
@@ -130,11 +114,8 @@ class UserAPI(MethodResource, Resource):
 
         # print(type(result))
 
-        ############## Added access control for front end by Karan ##################
         jsonResult = jsonify(result)
-        jsonResult.headers.add('Access-Control-Allow-Origin',
-                    '*')
-        jsonResult.header('Access-Control-Allow-Headers', "*")
+        
         return jsonResult
 
     @login_required
@@ -147,22 +128,16 @@ class UserAPI(MethodResource, Resource):
 
         if int(id) != current_id:
 
-            ############## Added access control for front end by Karan ##################
             jsonError = jsonify({"Error": "Incorrect User ID"})
-            jsonError.headers.add('Access-Control-Allow-Origin',
-                                   '*')
-            jsonError.header('Access-Control-Allow-Headers', "*")
+            
             return jsonError
 
         user = User.query.filter_by(id=id).first()
         result = dict()
         if user is None:
 
-            ############## Added access control for front end by Karan ##################
             jsonResult = jsonify({"Content": "User not found"})
-            jsonResult.headers.add('Access-Control-Allow-Origin',
-                                   '*')
-            jsonResult.header('Access-Control-Allow-Headers', "*")
+           
             return jsonResult
 
         User.query.filter_by(id=id).delete()
@@ -170,9 +145,6 @@ class UserAPI(MethodResource, Resource):
         db.session.commit()
         result["Success"] = "User deleted"
         # print(type(result))
-        ############## Added access control for front end by Karan ##################
         jsonResult = jsonify(result)
-        jsonResult.headers.add('Access-Control-Allow-Origin',
-                               '*')
-        jsonResult.header('Access-Control-Allow-Headers', "*")
+        
         return jsonResult
