@@ -94,7 +94,7 @@ class UserAPI(MethodResource, Resource):
         # print(type(result))
         return jsonify(result)
 
-class GroupAPI(Resource):
+class GroupAPI(MethodResource, Resource):
     @doc(description='Post request for group creation feature.', tags=['Group'])
     @use_kwargs(GroupSchema)
     def post(self):

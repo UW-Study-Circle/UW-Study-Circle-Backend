@@ -39,7 +39,7 @@ app.config['MAIL_PASSWORD'] = '150724yan'#os.environ.get('EMAIL_PASSWORD')
 mail = Mail(app)
 
 db.init_app(app)
-from models import User
+from models import User, Group
 
 with app.app_context():
     db.create_all()
@@ -67,3 +67,11 @@ api.add_resource(UserAPI, '/api/user/id/<id>', endpoint="delete_user", methods=[
 docs.register(UserAPI, endpoint="create_user")
 docs.register(UserAPI, endpoint="search_user")
 docs.register(UserAPI, endpoint="delete_user")
+
+api.add_resource(GroupAPI, '/api/group/', endpoint="create_group", methods=['POST'])
+api.add_resource(GroupAPI, '/api/group/groupname/<groupname>', endpoint="search_group", methods=['GET'])
+api.add_resource(GroupAPI, '/api/group/groupid/<groupid>', endpoint="delete_group", methods=['DELETE'])
+
+docs.register(GroupAPI, endpoint="create_group")
+docs.register(GroupAPI, endpoint="search_group")
+docs.register(GroupAPI, endpoint="delete_group")
