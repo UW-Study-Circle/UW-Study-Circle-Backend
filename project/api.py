@@ -95,6 +95,8 @@ class UserAPI(MethodResource, Resource):
         return jsonify(result)
 
 class GroupAPI(Resource):
+    @doc(description='Post request for group creation feature.', tags=['Group'])
+    @use_kwargs(GroupSchema)
     def post(self):
         body = request.get_json()
         if body is None:
@@ -131,7 +133,7 @@ class GroupAPI(Resource):
             error = dict()
             error["Error"] = str(e)
             return jsonify(error)
-
+    @doc(description='Get request for search feature by groupname.', tags=['Group'])
     def get(self, groupname):
         group = Group.query.filter_by(groupname=groupname).first()
         result = dict()
@@ -141,7 +143,7 @@ class GroupAPI(Resource):
         result["Content"] = group_schema.dump(group)
         # print(type(result))
         return jsonify(result)
-
+    @doc(description='Delete request for delete group feature.', tags=['Group'])
     def delete(self, id):
         group = Group.query.filter_by(groupid=groupid).first()
         result = dict()
