@@ -61,11 +61,15 @@ api = Api(app)
 CORS(app, supports_credentials=True)
 api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
+api.add_resource(ProfileAPI, '/api/logout/<logout>', endpoint="logout", methods=['GET'])
+
 api.add_resource(ProfileAPI, '/api/login/', endpoint="login_user", methods=['POST'])
 
 docs.register(ProfileAPI, endpoint="profile")
 docs.register(ProfileAPI, endpoint="profile_id")
 docs.register(ProfileAPI, endpoint="login_user")
+docs.register(ProfileAPI, endpoint="logout")
+
 
 
 api.add_resource(UserAPI, '/api/user/', endpoint="create_user", methods=['POST'])

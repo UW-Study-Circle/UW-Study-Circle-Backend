@@ -13,11 +13,14 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 class ProfileAPI(MethodResource, Resource):
     @doc(description='User Profile API.', tags=['User-Profile'])
-    def get(self, id=None):
+    def get(self, id=None, logout=False):
         '''
         Get method to fetch logged-in user's profile
         '''
         if current_user.is_authenticated:
+            if logout:
+                logout_user()
+                return {"Logout Successful!": True}
             if id == None:
                 return user_schema.dump(current_user)
             else:
