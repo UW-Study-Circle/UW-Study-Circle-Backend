@@ -59,8 +59,14 @@ from api import *
 docs = FlaskApiSpec(app)
 api = Api(app)
 CORS(app)
-api.add_resource(ProfileAPI, '/', endpoint="profile")
+api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
+api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
+api.add_resource(ProfileAPI, '/api/login/', endpoint="login_user", methods=['POST'])
+
 docs.register(ProfileAPI, endpoint="profile")
+docs.register(ProfileAPI, endpoint="profile_id")
+docs.register(ProfileAPI, endpoint="login_user")
+
 
 api.add_resource(UserAPI, '/api/user/', endpoint="create_user", methods=['POST'])
 api.add_resource(UserAPI, '/api/user/email/<email>/password/<password>', endpoint="search_user", methods=['GET'])
@@ -71,8 +77,8 @@ docs.register(UserAPI, endpoint="search_user")
 docs.register(UserAPI, endpoint="delete_user")
 
 api.add_resource(GroupAPI, '/api/group/', endpoint="create_group", methods=['POST'])
-api.add_resource(GroupAPI, '/api/group/groupname/<groupname>', endpoint="search_group", methods=['GET'])
-api.add_resource(GroupAPI, '/api/group/groupid/<groupid>', endpoint="delete_group", methods=['DELETE'])
+api.add_resource(GroupAPI, '/api/group/', endpoint="search_group", methods=['GET'])
+api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="delete_group", methods=['DELETE'])
 
 docs.register(GroupAPI, endpoint="create_group")
 docs.register(GroupAPI, endpoint="search_group")

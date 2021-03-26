@@ -1,25 +1,69 @@
 from flask import Response, request, jsonify
 from flask_restful import Resource
+from webargs import fields
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_apispec import doc, use_kwargs, marshal_with
 from flask_apispec.views import MethodResource
 
 from models import User, UserSchema, Group, GroupSchema
 user_schema = UserSchema()
-group_schema = GroupSchema()
+group_schema = GroupSchema(many=True)
 
 from flask_login import login_user, logout_user, login_required, current_user
 
 class ProfileAPI(MethodResource, Resource):
     @doc(description='User Profile API.', tags=['User-Profile'])
-    def get(self):
+    def get(self, id=None):
         '''
         Get method to fetch logged-in user's profile
         '''
         if current_user.is_authenticated:
-            print(current_user)
-            return user_schema.dump(current_user)
+            if id == None:
+                return user_schema.dump(current_user)
+            else:
+                result = dict()
+                user = User.query.get(id)
+                if user:
+                    result["username"] = user.username
+                    result["firstname"] = user.firstname
+                    result["lastname"] = user.lastname
+                else:
+                    result["username"] = None
+                return jsonify(result)
         return {'Error': 'Unauthenticated'}
+    
+    @doc(description='Login User API.', tags=['User-Profile'])
+    @use_kwargs({
+        'email': fields.Str(),
+        'password': fields.Str()
+    })
+    def post(self, **kwargs):
+        '''
+        Post method for User Login
+        '''
+        body = request.get_json()
+        if body is None:
+            return jsonify({"Error": "Data not in correct format"})
+        print(body)
+        result = dict()
+        try:
+            email = body["email"]
+            password = body["password"]
+            user = User.query.filter_by(email=email).first()
+            print(user)
+            if not user or not check_password_hash(user.password, password): 
+                return {"Content": None} # if user doesn't exist or password is wrong, reload the page
+
+            # if the above check passes, then we know the user has the right credentials
+            login_user(user, remember=True)
+            
+            
+            result["Content"] = user_schema.dump(user)
+        except Exception as e:
+            result["Error"] = str(e)
+        # print(type(result))
+        return jsonify(result)
+
 
 class UserAPI(MethodResource, Resource):
     @doc(description='Post request for signup feature.', tags=['User'])
@@ -115,7 +159,7 @@ class GroupAPI(MethodResource, Resource):
     @doc(description='Post request for group creation feature.', tags=['Group'])
     @use_kwargs(GroupSchema)
     @login_required
-    def post(self):
+    def post(self, **kwargs):
         body = request.get_json()
         if body is None:
             return jsonify({"Error": "Data not in correct format"})
@@ -124,21 +168,21 @@ class GroupAPI(MethodResource, Resource):
         result = dict()
         try:
             groupname = body["groupname"]
-            groupid = body["groupid"]
             courseinfo = body["courseinfo"]
             level = body["level"]
             description = body["description"]
             capacity = body["capacity"]
             duration = body["duration"]
             status = body["status"]         
-                
+            admin_id = current_user.id
+
             groupname_exist = Group.query.filter_by(groupname=groupname).first() 
             if groupname_exist:
                 result["Duplicate"] = "Group Name already exists"
                 return jsonify(result)   
             new_group = Group(
-                groupname=groupname, groupid=groupid, courseinfo=courseinfo, level=level, description=description,
-                capacity=capacity, duration=duration, status=status)
+                groupname=groupname, courseinfo=courseinfo, level=level, description=description,
+                capacity=capacity, duration=duration, status=status, admin=admin_id)
             # add the new group to the database
             from server import db
 
@@ -152,15 +196,16 @@ class GroupAPI(MethodResource, Resource):
             error["Error"] = str(e)
             return jsonify(error)
 
-    @doc(description='Get request for search feature by groupname.', tags=['Group'])
+    @doc(description='Get all Groups.', tags=['Group'])
     @login_required
-    def get(self, groupname):
-        group = Group.query.filter_by(groupname=groupname).first()
+    def get(self):
+        groups = Group.query.all()
         result = dict()
-        if group is None:
+        print(groups)
+        if groups is None:
             return {"Content": None}
 
-        result["Content"] = group_schema.dump(group)
+        result["Content"] = group_schema.dump(groups)
         # print(type(result))
         return jsonify(result)
 
@@ -172,7 +217,11 @@ class GroupAPI(MethodResource, Resource):
         if group is None:
             return {"Content": "Group not found"}
 
-        Group.query.filter_by(groupid=groupid).delete()
-        result["Success"] = "Group deleted"
+        c_user_id = current_user.id
+        if c_user_id == group.admin:
+            Group.query.filter_by(groupid=groupid).delete()
+            result["Success"] = "Group deleted"
+        else:
+            result["Error"] = "Not admin"
         # print(type(result))
         return jsonify(result)

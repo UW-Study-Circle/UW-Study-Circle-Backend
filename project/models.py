@@ -19,13 +19,14 @@ class User(UserMixin, db.Model):
 
 class Group(UserMixin, db.Model):
     groupname = db.Column(db.String(1000), unique=True)
-    groupid = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     courseinfo = db.Column(db.String(1000))
     level = db.Column(db.String(1000))
     description = db.Column(db.String(2000), nullable=True)
     capacity = db.Column(db.Integer)
     duration = db.Column(db.Integer)
     status = db.Column(db.String(100))
+    admin = db.Column(db.Integer) #userID of admin
     
     def get_reset_token(self, expires=600):
         return jwt.encode({'reset_password': self.id, 'exp': time() + expires},
@@ -60,12 +61,13 @@ class UserSchema(Schema):
 
 class GroupSchema(Schema):
     groupname = fields.Str()
-    groupid = fields.Int(dump_only=True)
+    id = fields.Int(dump_only=True)
     courseinfo = fields.Str()
     level = fields.Str()
     description = fields.Str()
     capacity = fields.Int()
     duration = fields.Int()
     status = fields.Str()
+    admin = fields.Int() # userID
     def format_name(self, group):
         return "{}".format(group.groupname)

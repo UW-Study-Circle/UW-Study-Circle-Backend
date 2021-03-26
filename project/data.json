@@ -1,0 +1,100 @@
+{
+    "users":
+    [
+        {
+            "username": "akshat", 
+            "password": "aaaa",
+            "email": "a@e.c",
+            "lastname": "Akshat",
+            "firstname": "Sinha",
+            "gender": "Male",
+            "phonenumber": "123456789",
+            "bday": "28-01-1995"
+        },
+        {
+            "username": "apeksha", 
+            "password": "aaaa",
+            "email": "ap@e.c",
+            "lastname": "Apeksha",
+            "firstname": "Maithal",
+            "gender": "Female",
+            "phonenumber": "123456789",
+            "bday": "31-01-1999"
+        },
+        {
+            "username": "arshad", 
+            "password": "aaaa",
+            "email": "ar@e.c",
+            "lastname": "Arshad",
+            "firstname": "Habib",
+            "gender": "Male",
+            "phonenumber": "123456789",
+            "bday": "31-01-1999"
+        },
+        {
+            "username": "karan", 
+            "password": "aaaa",
+            "email": "k@e.c",
+            "lastname": "Karan",
+            "firstname": "Patel",
+            "gender": "Male",
+            "phonenumber": "123456789",
+            "bday": "31-01-1999"
+        },
+        {
+            "username": "yuting", 
+            "password": "aaaa",
+            "email": "y@e.c",
+            "lastname": "Yuting",
+            "firstname": "Yan",
+            "gender": "Female",
+            "phonenumber": "123456789",
+            "bday": "31-01-1999"
+        },
+        {
+            "username": "pingq", 
+            "password": "aaaa",
+            "email": "p@e.c",
+            "lastname": "Ping",
+            "firstname": "Qu",
+            "gender": "Female",
+            "phonenumber": "123456789",
+            "bday": "31-01-1999"
+        }
+
+    ],
+    "groups" :
+    [
+        {
+            "admin": 1,
+            "capacity": 50,
+            "courseinfo": "cs-506",
+            "description": "Software Engineering Course Group",
+            "duration": 0,
+            "groupname": "Software Engg",
+            "level": "Advanced",
+            "status": "Public"
+        },
+        {
+            "admin": 1,
+            "capacity": 50,
+            "courseinfo": "cs-354",
+            "description": "Machine Organization",
+            "duration": 0,
+            "groupname": "Assembly Language Group",
+            "level": "Basic",
+            "status": "Public"
+        },
+        {
+            "admin": 2,
+            "capacity": 50,
+            "courseinfo": "cs-839",
+            "description": "Security Group",
+            "duration": 0,
+            "groupname": "Paper Discussion",
+            "level": "Advanced",
+            "status": "Private"
+        }
+
+    ]
+}
