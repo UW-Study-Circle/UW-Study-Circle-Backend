@@ -58,7 +58,7 @@ from api import *
 
 docs = FlaskApiSpec(app)
 api = Api(app)
-CORS(app)
+CORS(app, supports_credentials=True)
 api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
 api.add_resource(ProfileAPI, '/api/login/', endpoint="login_user", methods=['POST'])
