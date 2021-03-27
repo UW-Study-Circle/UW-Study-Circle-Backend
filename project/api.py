@@ -199,15 +199,21 @@ class GroupAPI(MethodResource, Resource):
             error["Error"] = str(e)
             return jsonify(error)
 
-    @doc(description='Get all Groups.', tags=['Group'])
+    @doc(description='Get all Groups or search by description.', tags=['Group'])
     @login_required
-    def get(self):
-        groups = Group.query.all()
+    def get(self, search=None):
+        groups_query = Group.query.all()
+        groups = []
         result = dict()
-        print(groups)
-        if groups is None:
+        print(groups_query)
+        if groups_query is None:
             return {"Content": None}
-
+        if search:
+            for i in groups_query:
+                if search.lower() in i.description.lower():
+                    groups.append(i)
+        else:
+            groups = groups_query
         result["Content"] = group_schema.dump(groups)
         # print(type(result))
         return jsonify(result)
