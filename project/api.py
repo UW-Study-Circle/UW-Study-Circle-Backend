@@ -8,6 +8,7 @@ from flask_apispec.views import MethodResource
 from models import User, UserSchema, Group, GroupSchema
 user_schema = UserSchema()
 group_schema = GroupSchema(many=True)
+single_group_schema = GroupSchema()
 
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -201,13 +202,19 @@ class GroupAPI(MethodResource, Resource):
 
     @doc(description='Get all Groups or search by description.', tags=['Group'])
     @login_required
-    def get(self, search=None):
+    def get(self, search=None, id=None):
         groups_query = Group.query.all()
         groups = []
         result = dict()
-        print(groups_query)
+        print(groups_query)        
         if groups_query is None:
             return {"Content": None}
+        
+        if id:
+            group = Group.query.get(id)
+            print(group)
+            return single_group_schema.dump(group)
+
         if search:
             for i in groups_query:
                 if search.lower() in i.description.lower():

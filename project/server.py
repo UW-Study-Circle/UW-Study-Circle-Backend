@@ -82,10 +82,12 @@ docs.register(UserAPI, endpoint="delete_user")
 
 api.add_resource(GroupAPI, '/api/group/', endpoint="create_group", methods=['POST'])
 api.add_resource(GroupAPI, '/api/group/', endpoint="search_group", methods=['GET'])
+api.add_resource(GroupAPI, '/api/group/<id>', endpoint="get_group_id", methods=['GET'])
 api.add_resource(GroupAPI, '/api/group/<search>', endpoint="search_group_query", methods=['GET'])
 api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="delete_group", methods=['DELETE'])
 
 docs.register(GroupAPI, endpoint="create_group")
 docs.register(GroupAPI, endpoint="search_group")
+docs.register(GroupAPI, endpoint="get_group_id")
 docs.register(GroupAPI, endpoint="search_group_query")
 docs.register(GroupAPI, endpoint="delete_group")
