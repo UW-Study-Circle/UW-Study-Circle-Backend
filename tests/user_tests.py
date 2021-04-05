@@ -89,3 +89,18 @@ class UserTest(unittest.TestCase):
         # Delete Database collections after the test is complete
         for collection in self.db.list_collection_names():
             self.db.drop_collection(collection)
+            
+    def test_bucketlist_can_be_edited(self):
+        """Test API can edit an existing bucketlist. (PUT request)"""
+        rv = self.client().post(
+            '/bucketlists/',
+            data={'name': 'Eat, pray and love'})
+        self.assertEqual(rv.status_code, 201)
+        rv = self.client().put(
+            '/bucketlists/1',
+            data={
+                "name": "Dont just eat, but also pray and love :-)"
+            })
+        self.assertEqual(rv.status_code, 200)
+        results = self.client().get('/bucketlists/1')
+        self.assertIn('Dont just eat', str(results.data))
