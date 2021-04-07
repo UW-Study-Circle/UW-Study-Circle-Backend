@@ -27,23 +27,19 @@ class Group(UserMixin, db.Model):
     duration = db.Column(db.Integer)
     status = db.Column(db.String(100))
     admin = db.Column(db.Integer) #userID of admin
-    
-    def get_reset_token(self, expires=600):
-        return jwt.encode({'reset_password': self.id, 'exp': time() + expires},
-                          app.config['SECRET_KEY'],
-                          algorithm='HS256')
 
-    @staticmethod
-    def verify_reset_token(token):
-        try:
-            user_id = jwt.decode(token, 
-                                 app.config['SECRET_KEY'], 
-                                algorithms='HS256')['reset_password']
-        except Exception as e:
-            print(e)
-            return
-        return User.query.get(user_id)
+class Member(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    group_id = db.Column(db.Integer)
+    pending = db.Column(db.Boolean)
 
+class MemberSchema(Schema):
+    id = fields.Int(dump_only=True)
+    user_id = fields.Int()
+    group_id = fields.Int()
+    pending = fields.Bool()
+        
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)

@@ -5,8 +5,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_apispec import doc, use_kwargs, marshal_with
 from flask_apispec.views import MethodResource
 
-from models import User, UserSchema, Group, GroupSchema
+from models import User, UserSchema, Group, GroupSchema, Member, MemberSchema
 user_schema = UserSchema()
+member_schema = MemberSchema()
+members_schema = MemberSchema(many=True)
+
 group_schema = GroupSchema(many=True)
 single_group_schema = GroupSchema()
 
@@ -240,4 +243,54 @@ class GroupAPI(MethodResource, Resource):
         else:
             result["Error"] = "Not admin"
         # print(type(result))
+        return jsonify(result)
+
+
+class MemberAPI(MethodResource, Resource):
+    @login_required
+    @doc(description='GET request to get memberlist or grouplist.', tags=['Member'])
+    def get(self, user_id=None, group_id=None):
+        if user_id:
+            grouplist = Member.query.filter_by(user_id = user_id)
+            return members_schema.dump(grouplist)
+        
+        if group_id:
+            members_list = Member.query.filter_by(group_id = group_id)
+            return members_schema.dump(members_list)
+        return {}
+        
+
+    @login_required
+    @doc(description='Put request for join group feature.', tags=['Member'])    
+    def put(self, id):
+        user_id = current_user.id
+        group = Group.query.get(id)
+        result = dict()
+
+        if group:
+            try:
+                status = group.status
+                group_id = group.id
+                member_exist = Member.query.filter_by(user_id = user_id, group_id = group_id).first() 
+                if member_exist:
+                    return jsonify({"Error": "Member already Exists"})
+
+                if status == "Public": 
+                    new_member = Member(user_id = user_id, group_id = group_id, pending = False)
+                    print("Public group, adding member to group")
+                else: 
+                    new_member = Member(user_id = user_id, group_id = group_id, pending = True)
+                    print("Public group, adding member to new member requests")
+                
+                from server import db
+
+                db.session.add(new_member)
+                db.session.commit()
+                result["Success"] = "Member Added"
+                return jsonify(result)
+            except Exception as e:
+                error = dict()
+                error["Error"] = str(e)
+                return jsonify(error)
+        result["Error"] = "Group does not exist"
         return jsonify(result)
