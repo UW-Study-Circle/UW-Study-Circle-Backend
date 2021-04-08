@@ -31,8 +31,10 @@ class ProfileAPI(MethodResource, Resource):
                     result["username"] = user.username
                     result["firstname"] = user.firstname
                     result["lastname"] = user.lastname
+                    result["Message"] = "Successfully fetched user profile."
                 else:
                     result["username"] = None
+                    result["Message"] = "Sorry, couldn't fetch user profile."
                 return jsonify(result)
         return {'Error': 'Unauthenticated'}
     
@@ -56,13 +58,18 @@ class ProfileAPI(MethodResource, Resource):
             user = User.query.filter_by(email=email).first()
             print(user)
             if not user or not check_password_hash(user.password, password): 
-                return {"Content": None} # if user doesn't exist or password is wrong, reload the page
+                result["Status"] = "Fail"
+                result["Message"] = "User does not exist or password is wrong."
+                result["Content"] = None
+                return jsonify(result) # if user doesn't exist or password is wrong, reload the page
 
             # if the above check passes, then we know the user has the right credentials
             login_user(user, remember=True)
             
             
             result["Content"] = user_schema.dump(user)
+            result["Status"] = "Pass"
+            result["Message"] = "User exists and correct credentials"
         except Exception as e:
             result["Error"] = str(e)
         # print(type(result))
@@ -100,7 +107,7 @@ class UserAPI(MethodResource, Resource):
                 result["Duplicate"] = "Email already exists"
                 return jsonify(result)
             if name_exist:
-                result["Duplicate"] = "Name already exists"
+                result["Duplicate"] = "Username already exists"
                 return jsonify(result)   
             new_user = User(
                 email=email, username=username, password=generate_password_hash(password, method='sha256'),
@@ -110,7 +117,7 @@ class UserAPI(MethodResource, Resource):
 
             db.session.add(new_user)
             db.session.commit()
-            result["Success"] = "User created"
+            result["Success"] = "New user has been successfully created"
             return jsonify(result)
             
 
@@ -124,15 +131,19 @@ class UserAPI(MethodResource, Resource):
         '''
         Get method for User Login
         '''
+        if email is None:
+            return{"Content": None, "Message":"Error: No email was provided"}
         user = User.query.filter_by(email=email).first()
-        if not user or not check_password_hash(user.password, password): 
-            return {"Content": None} # if user doesn't exist or password is wrong, reload the page
+        if not user or not check_password_hash(user.password, password) or user is None: 
+            return {"Content": None, "Message":"Error: User doesn't exist or password is wrong"} 
+            # if user doesn't exist or password is wrong, reload the page
 
         # if the above check passes, then we know the user has the right credentials
         login_user(user, remember=True)
         result = dict()
             
         result["Content"] = user_schema.dump(user)
+        result["Message"] = "Success searching for user"
         # print(type(result))
         return jsonify(result)
 
@@ -142,21 +153,20 @@ class UserAPI(MethodResource, Resource):
         '''
         Delete method for User deletion
         '''
-        current_id = current_user.id
-
-        if int(id) != current_id:
-            return jsonify({"Error": "Incorrect User ID"})
-
+        try:
+            current_id = current_user.id
+            if int(id) != current_id:
+                return jsonify({"Error": "Incorrect User ID"})
+        except Exception as e:
+                return jsonify({"Error": "Invalid input for User ID"})
         user = User.query.filter_by(id=id).first()
         result = dict()
         if user is None:
             return {"Content": "User not found"}
-
         User.query.filter_by(id=id).delete()
         from server import db
         db.session.commit()
-        result["Success"] = "User deleted"
-        # print(type(result))
+        result["Success"] = "User has been successfully deleted"
         return jsonify(result)
 
 class GroupAPI(MethodResource, Resource):
