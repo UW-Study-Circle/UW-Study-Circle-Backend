@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_apispec import doc, use_kwargs, marshal_with
 from flask_apispec.views import MethodResource
 
-from models import User, UserSchema, Group, GroupSchema, Member, MemberSchema, MemberApprovalSchema
+from models import *
 user_schema = UserSchema()
 member_schema = MemberSchema()
 members_schema = MemberSchema(many=True)
@@ -16,6 +16,32 @@ single_group_schema = GroupSchema()
 from flask_login import login_user, logout_user, login_required, current_user
 
 class ProfileAPI(MethodResource, Resource):
+    # @login_required
+    @doc(description='Put request for password reset.', tags=['User-Profile'])    
+    @use_kwargs(ResetPasswordSchema)
+    def put(self, **kwargs):
+        try:
+            user = current_user
+            body = request.get_json()
+            result = dict()
+            if body is None:
+                return jsonify({"Error": "Data not in correct format"})
+            print(body)
+            current_password = body["cpwd"]
+            new_password = body["npwd"]
+            print(user.password)
+            if check_password_hash(user.password, current_password):
+                user.password = generate_password_hash(new_password, method='sha256')
+                result["Success"] = "New Password set successfully!"
+                print(user.password)
+                from server import db
+                db.session.commit()
+            else:
+                result["Failure"] = "Wrong Current Password. Try Again"
+            return jsonify(result)
+        except Exception as e:
+            return jsonify({"Error": str(e)})
+
     @doc(description='User Profile API.', tags=['User-Profile'])
     def get(self, id=None, logout=False):
         '''
@@ -83,7 +109,7 @@ class UserAPI(MethodResource, Resource):
         body = request.get_json()
         if body is None:
             return jsonify({"Error": "Data not in correct format"})
-        # print(body)
+        print(body)
         
         result = dict()
         try:
@@ -192,7 +218,6 @@ class GroupAPI(MethodResource, Resource):
                 capacity=capacity, duration=duration, status=status, admin=admin_id)
             # add the new group to the database
             from server import db
-            print(new_group)
             db.session.add(new_group)
             db.session.commit()
             result["Success"] = "Group created"

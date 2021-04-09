@@ -6,10 +6,6 @@ import jwt
 from time import time
 from marshmallow import Schema, fields
 
-group_user = db.Table('group_user', 
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('group_id', db.Integer, db.ForeignKey('group.id'))
-)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
@@ -21,10 +17,6 @@ class User(UserMixin, db.Model):
     gender = db.Column(db.String(1000))
     bday = db.Column(db.String(1000))
     phonenumber = db.Column(db.String(100), nullable=True)
-    
-    groups = db.relationship('Group', secondary=group_user, 
-        backref=db.backref('user_id', lazy='dynamic'))
-   
 
 class Group(UserMixin, db.Model):
     groupname = db.Column(db.String(1000), unique=True)
@@ -36,10 +28,6 @@ class Group(UserMixin, db.Model):
     duration = db.Column(db.Integer)
     status = db.Column(db.String(100))
     admin = db.Column(db.Integer) #userID of admin
-    
-    users = db.relationship('User', secondary=group_user,
-        backref=db.backref('group_id', lazy='dynamic'))
-    
 
 class Member(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -57,7 +45,10 @@ class MemberApprovalSchema(Schema):
     request_id = fields.Int()
     group_id = fields.Int()
     approval = fields.Bool()
-        
+
+class ResetPasswordSchema(Schema):
+    cpwd = fields.Str()
+    npwd = fields.Str()
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -72,6 +63,9 @@ class UserSchema(Schema):
     phonenumber = fields.Str()
     def format_name(self, user):
         return "{}".format(user.username)
+
+    
+   
 
 class GroupSchema(Schema):
     groupname = fields.Str()

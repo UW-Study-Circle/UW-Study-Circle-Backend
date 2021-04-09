@@ -2,6 +2,7 @@ import json
 from server import db, app
 from models import User, Group, Member
 from werkzeug.security import generate_password_hash, check_password_hash
+
 def populate_data():
     app.app_context().push()
 

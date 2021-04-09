@@ -19,7 +19,7 @@ class GroupTestCase(unittest.TestCase):
         # self.app = create_app(config_name="testing")
         # app.config['LOGIN_DISABLED'] = True
         self.client = app.test_client()
-        # app.config['TESTING'] = True
+        app.config['TESTING'] = True
         with app.app_context():
             # create all tables
             db.create_all()
@@ -95,7 +95,6 @@ class GroupTestCase(unittest.TestCase):
         
         self.assertEqual(res.status_code, 200)
         self.assertIn("Group created", res.json['Success'])
-        
     def test_group_creation_with_none_json(self):
         
         res = self.client.post('/api/group/',  headers={"Content-Type": "text/plain"}, data="1234")
@@ -128,10 +127,8 @@ class GroupTestCase(unittest.TestCase):
         """Test API  with no group (GET request)"""
         
         res = self.client.get('/api/group/', headers={"Content-Type": "application/json"})
-        print("ffffffffffffffffffffffffffffff", res.json)
         self.assertEqual(res.status_code, 200)
         self.assertFalse(res.json['Content'])
-       
         
     def test_api_can_get_groups(self):
         """Test API can get all groups (GET request)."""
@@ -153,7 +150,6 @@ class GroupTestCase(unittest.TestCase):
         res = self.client.get('/api/group/id/2')
         
         self.assertEqual(res.status_code, 200)
-        # print("cccccccccccccccccccccccccccccccc", res.json)
         self.assertEqual("cs536", res.json['groupname'])
         
     def test_api_can_get_group_by_nonexisting_id(self):
