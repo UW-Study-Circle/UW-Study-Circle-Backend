@@ -5,19 +5,26 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_apispec import doc, use_kwargs, marshal_with
 from flask_apispec.views import MethodResource
 
-from models import User, UserSchema, Group, GroupSchema
+from models import User, UserSchema, Group, GroupSchema, Member, MemberSchema, MemberApprovalSchema
 user_schema = UserSchema()
+member_schema = MemberSchema()
+members_schema = MemberSchema(many=True)
+
 group_schema = GroupSchema(many=True)
+single_group_schema = GroupSchema()
 
 from flask_login import login_user, logout_user, login_required, current_user
 
 class ProfileAPI(MethodResource, Resource):
     @doc(description='User Profile API.', tags=['User-Profile'])
-    def get(self, id=None):
+    def get(self, id=None, logout=False):
         '''
         Get method to fetch logged-in user's profile
         '''
         if current_user.is_authenticated:
+            if logout:
+                logout_user()
+                return {"Logout Successful!": True}
             if id == None:
                 return user_schema.dump(current_user)
             else:
@@ -50,7 +57,7 @@ class ProfileAPI(MethodResource, Resource):
             email = body["email"]
             password = body["password"]
             user = User.query.filter_by(email=email).first()
-            # print(user)
+            print(user)
             if not user or not check_password_hash(user.password, password): 
                 return {"Content": None} # if user doesn't exist or password is wrong, reload the page
 
@@ -59,7 +66,6 @@ class ProfileAPI(MethodResource, Resource):
             
             
             result["Content"] = user_schema.dump(user)
-            
         except Exception as e:
             result["Error"] = str(e)
         # print(type(result))
@@ -77,7 +83,7 @@ class UserAPI(MethodResource, Resource):
         body = request.get_json()
         if body is None:
             return jsonify({"Error": "Data not in correct format"})
-        print(body)
+        # print(body)
         
         result = dict()
         try:
@@ -149,8 +155,8 @@ class UserAPI(MethodResource, Resource):
         if user is None:
             return {"Content": "User not found"}
 
-        User.query.filter_by(id=id).delete()
         from server import db
+        db.session.delete(user)
         db.session.commit()
         result["Success"] = "User deleted"
         # print(type(result))
@@ -186,7 +192,7 @@ class GroupAPI(MethodResource, Resource):
                 capacity=capacity, duration=duration, status=status, admin=admin_id)
             # add the new group to the database
             from server import db
-
+            print(new_group)
             db.session.add(new_group)
             db.session.commit()
             result["Success"] = "Group created"
@@ -197,15 +203,27 @@ class GroupAPI(MethodResource, Resource):
             error["Error"] = str(e)
             return jsonify(error)
 
-    @doc(description='Get all Groups.', tags=['Group'])
+    @doc(description='Get all Groups or search by description.', tags=['Group'])
     @login_required
-    def get(self):
-        groups = Group.query.all()
+    def get(self, search=None, id=None):
+        groups_query = Group.query.all()
+        groups = []
         result = dict()
-        print(groups)
-        if groups is None:
+        print(groups_query)        
+        if groups_query is None:
             return {"Content": None}
+        
+        if id:
+            group = Group.query.get(id)
+            print(group)
+            return single_group_schema.dump(group)
 
+        if search:
+            for i in groups_query:
+                if search.lower() in i.description.lower():
+                    groups.append(i)
+        else:
+            groups = groups_query
         result["Content"] = group_schema.dump(groups)
         # print(type(result))
         return jsonify(result)
@@ -220,10 +238,130 @@ class GroupAPI(MethodResource, Resource):
 
         c_user_id = current_user.id
         if c_user_id == group.admin:
-            Group.query.filter_by(id=id).delete()
+            from server import db
+            db.session.delete(group)
+            db.session.commit()
             result["Success"] = "Group deleted"
-            print( Group.query.all())
         else:
             result["Error"] = "Not admin"
         # print(type(result))
+        return jsonify(result)
+
+
+class MemberAPI(MethodResource, Resource):
+    @login_required
+    @doc(description='GET request to get memberlist or grouplist.', tags=['Member'])
+    def get(self, user_id=None, group_id=None):
+        try:
+            if user_id:
+                result = dict()
+                current_user_id = current_user.id
+                # print(type(user_id))
+                if current_user_id != int(user_id):
+                    result["Error"] = "Unauthorized request"
+                    return jsonify(result)
+                grouplist = Member.query.filter_by(user_id = user_id)
+                return members_schema.dump(grouplist)
+            
+            if group_id:
+                members_list = Member.query.filter_by(group_id = group_id)
+                return members_schema.dump(members_list)
+        except Exception as e:
+            return jsonify({
+                "Error": str(e)
+            })
+
+    @use_kwargs(MemberApprovalSchema)
+    @doc(description='POST request for admin request approval feature.', tags=['Member'])   
+    @login_required
+    def post(self, **kwargs):
+        body = request.get_json()
+        if body is None:
+            return jsonify({"Error": "Data not in correct format"})
+        print(body)
+        
+        result = dict()
+        error = dict()
+        try:
+            group_id = body["group_id"]
+            request_id = body["request_id"]
+            approval = body["approval"]
+            group = Group.query.get(group_id)
+            if group:
+                admin_id = group.admin
+                current_user_id = current_user.id
+                if current_user_id != int(admin_id):
+                    error["Error"] = "Unauthorized request"
+                    return jsonify(error)
+                else:
+                    request_pending = Member.query.get(request_id)
+                    if request_pending:
+                        current_status = request_pending.pending
+                        print(approval, current_status)
+                        from server import db
+                        if current_status and approval:
+                            print("Current status is pending. Approving.")
+                            result["Status"] = "Request Approved"
+                            request_pending.pending = False
+                            db.session.commit()
+
+                        elif current_status and not approval:
+                            print("Current status is pending. Denying.")
+                            result["Status"] = "Request Denied"
+                            db.session.delete(request_pending)
+                            db.session.commit()
+                        
+                        else:
+                            result["Status"] = "No change in request"                    
+                        
+                        return jsonify(result)
+                    else:
+                        error["Error"] = "Request not found"
+                        return jsonify(error)
+
+            else:
+                error["Error"] = "Group not found"
+                return jsonify(error)
+
+
+        except Exception as e:
+            error["Error"] = str(e)
+            return jsonify(error)
+            
+
+    @login_required
+    @doc(description='Put request for join group feature.', tags=['Member'])    
+    def put(self, id):
+        user_id = current_user.id
+        group = Group.query.get(id)
+        result = dict()
+
+        if group:
+            try:
+                status = group.status
+                group_id = group.id
+                member_exist = Member.query.filter_by(user_id = user_id, group_id = group_id).first() 
+                if member_exist:
+                    return jsonify({"Error": "Member already Exists"})
+
+                if status == "Public": 
+                    new_member = Member(user_id = user_id, group_id = group_id, pending = False)
+                    print("Public group, adding member to group")
+                    result["Success"] = "Member Added"
+                else: 
+                    new_member = Member(user_id = user_id, group_id = group_id, pending = True)
+                    print("Public group, adding member to new member requests")
+                    result["Success"] = "Member's Request Added. Waiting for Admin Approval"
+                
+                from server import db
+
+                db.session.add(new_member)
+                db.session.commit()
+                
+                return jsonify(result)
+            except Exception as e:
+                error = dict()
+                error["Error"] = str(e)
+                return jsonify(error)
+        result["Error"] = "Group does not exist"
         return jsonify(result)

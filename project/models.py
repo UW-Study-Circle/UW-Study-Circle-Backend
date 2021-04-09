@@ -6,6 +6,11 @@ import jwt
 from time import time
 from marshmallow import Schema, fields
 
+group_user = db.Table('group_user', 
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('group_id', db.Integer, db.ForeignKey('group.id'))
+)
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
     email = db.Column(db.String(100), unique=True)
@@ -16,6 +21,10 @@ class User(UserMixin, db.Model):
     gender = db.Column(db.String(1000))
     bday = db.Column(db.String(1000))
     phonenumber = db.Column(db.String(100), nullable=True)
+    
+    groups = db.relationship('Group', secondary=group_user, 
+        backref=db.backref('user_id', lazy='dynamic'))
+   
 
 class Group(UserMixin, db.Model):
     groupname = db.Column(db.String(1000), unique=True)
@@ -28,22 +37,27 @@ class Group(UserMixin, db.Model):
     status = db.Column(db.String(100))
     admin = db.Column(db.Integer) #userID of admin
     
-    def get_reset_token(self, expires=600):
-        return jwt.encode({'reset_password': self.id, 'exp': time() + expires},
-                          app.config['SECRET_KEY'],
-                          algorithm='HS256')
+    users = db.relationship('User', secondary=group_user,
+        backref=db.backref('group_id', lazy='dynamic'))
+    
 
-    @staticmethod
-    def verify_reset_token(token):
-        try:
-            user_id = jwt.decode(token, 
-                                 app.config['SECRET_KEY'], 
-                                algorithms='HS256')['reset_password']
-        except Exception as e:
-            print(e)
-            return
-        return User.query.get(user_id)
+class Member(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
+    group_id = db.Column(db.Integer)
+    pending = db.Column(db.Boolean)
 
+class MemberSchema(Schema):
+    id = fields.Int(dump_only=True)
+    user_id = fields.Int()
+    group_id = fields.Int()
+    pending = fields.Bool()
+
+class MemberApprovalSchema(Schema):
+    request_id = fields.Int()
+    group_id = fields.Int()
+    approval = fields.Bool()
+        
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)

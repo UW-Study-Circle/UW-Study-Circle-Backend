@@ -5,8 +5,8 @@
             "username": "akshat", 
             "password": "aaaa",
             "email": "a@e.c",
-            "lastname": "Akshat",
-            "firstname": "Sinha",
+            "firstname": "Akshat",
+            "lastname": "Sinha",
             "gender": "Male",
             "phonenumber": "123456789",
             "bday": "28-01-1995"
@@ -15,8 +15,8 @@
             "username": "apeksha", 
             "password": "aaaa",
             "email": "ap@e.c",
-            "lastname": "Apeksha",
-            "firstname": "Maithal",
+            "firstname": "Apeksha",
+            "lastname": "Maithal",
             "gender": "Female",
             "phonenumber": "123456789",
             "bday": "31-01-1999"
@@ -25,8 +25,8 @@
             "username": "arshad", 
             "password": "aaaa",
             "email": "ar@e.c",
-            "lastname": "Arshad",
-            "firstname": "Habib",
+            "firstname": "Arshad",
+            "lastname": "Habib",
             "gender": "Male",
             "phonenumber": "123456789",
             "bday": "31-01-1999"
@@ -35,8 +35,8 @@
             "username": "karan", 
             "password": "aaaa",
             "email": "k@e.c",
-            "lastname": "Karan",
-            "firstname": "Patel",
+            "firstname": "Karan",
+            "lastname": "Patel",
             "gender": "Male",
             "phonenumber": "123456789",
             "bday": "31-01-1999"
@@ -45,8 +45,8 @@
             "username": "yuting", 
             "password": "aaaa",
             "email": "y@e.c",
-            "lastname": "Yuting",
-            "firstname": "Yan",
+            "firstname": "Yuting",
+            "lastname": "Yan",
             "gender": "Female",
             "phonenumber": "123456789",
             "bday": "31-01-1999"
@@ -55,8 +55,8 @@
             "username": "pingq", 
             "password": "aaaa",
             "email": "p@e.c",
-            "lastname": "Ping",
-            "firstname": "Qu",
+            "firstname": "Ping",
+            "lastname": "Qu",
             "gender": "Female",
             "phonenumber": "123456789",
             "bday": "31-01-1999"
@@ -94,7 +94,52 @@
             "groupname": "Paper Discussion",
             "level": "Advanced",
             "status": "Private"
+        },
+
+        {
+            "admin": 2,
+            "capacity": 50,
+            "courseinfo": "cs-536",
+            "description": "Compiler",
+            "duration": 0,
+            "groupname": "Compiler",
+            "level": "Advanced",
+            "status": "Public"
         }
 
+    ],
+    "members" :
+    [
+        {
+            "user_id": 4,
+            "group_id": 1,
+            "pending": true
+        },
+        {
+            "user_id": 4,
+            "group_id": 3,
+            "pending": false
+        },
+        {
+            "user_id": 5,
+            "group_id": 3,
+            "pending": true
+        },
+
+        {
+            "user_id": 1,
+            "group_id": 1,
+            "pending": true
+        },
+        {
+            "user_id": 1,
+            "group_id": 2,
+            "pending": false
+        },
+        {
+            "user_id": 2,
+            "group_id": 2,
+            "pending": false
+        }
     ]
 }

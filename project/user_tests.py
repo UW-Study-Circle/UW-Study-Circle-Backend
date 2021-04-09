@@ -3,14 +3,12 @@ import unittest
 import json
 from server import db, app
 
-# SQLALCHEMY_TRACK_MODIFICATIONS = False
-
 
 class UserTest(unittest.TestCase):
 
     def setUp(self):
         self.app = app.test_client()
-        # self.db = db.get_db()         
+        # self.db = db.get_db()
     
     def test_successful_signup(self):
         # Given
@@ -29,7 +27,7 @@ class UserTest(unittest.TestCase):
         response = self.app.post('/api/user/', headers={"Content-Type": "application/json"}, data=payload)
 
         # Then
-        self.assertEqual(str, type(response.json['id']))
+        # self.assertEqual(json, type(response.json))
         self.assertEqual(200, response.status_code)
     def test_duplicate_username_signup(self):
         payload = json.dumps({
@@ -45,10 +43,10 @@ class UserTest(unittest.TestCase):
 
         # When
         response = self.app.post('/api/user/', headers={"Content-Type": "application/json"}, data=payload)
-        
+
         # Then
         self.assertEqual(str, type(response.json['Duplicate']))
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(200, response.status_code)
     
     def test_duplicate_email_signup(self):
         payload = json.dumps({
@@ -64,10 +62,10 @@ class UserTest(unittest.TestCase):
 
         # When
         response = self.app.post('/api/user/', headers={"Content-Type": "application/json"}, data=payload)
-        requests.get('https://api.github.com/user', auth=('user', 'pass'))
+
         # Then
         self.assertEqual(str, type(response.json['Duplicate']))
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(200, response.status_code)
 
     def test_successful_delete_user(self):
 
@@ -91,4 +89,3 @@ class UserTest(unittest.TestCase):
         # Delete Database collections after the test is complete
         for collection in self.db.list_collection_names():
             self.db.drop_collection(collection)
-

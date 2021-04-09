@@ -37,13 +37,11 @@ app.config['MAIL_PORT'] = 465 #587
 app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = 'yyt_2008@126.com'#os.environ.get('EMAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = '150724yan'#os.environ.get('EMAIL_PASSWORD')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 mail = Mail(app)
 
 db.init_app(app)
-# from models import User, Group
-import models
+from models import User, Group, Member
 
 with app.app_context():
     db.create_all()
@@ -55,20 +53,24 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     # since the user_id is just the primary key of our user table, use it in the query for the user
-    return models.User.query.get(int(user_id))
+    return User.query.get(int(user_id))
 
 from api import *
 
 docs = FlaskApiSpec(app)
 api = Api(app)
-CORS(app)
+CORS(app, supports_credentials=True)
 api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
+api.add_resource(ProfileAPI, '/api/logout/<logout>', endpoint="logout", methods=['GET'])
+
 api.add_resource(ProfileAPI, '/api/login/', endpoint="login_user", methods=['POST'])
 
 docs.register(ProfileAPI, endpoint="profile")
 docs.register(ProfileAPI, endpoint="profile_id")
 docs.register(ProfileAPI, endpoint="login_user")
+docs.register(ProfileAPI, endpoint="logout")
+
 
 
 api.add_resource(UserAPI, '/api/user/', endpoint="create_user", methods=['POST'])
@@ -81,8 +83,24 @@ docs.register(UserAPI, endpoint="delete_user")
 
 api.add_resource(GroupAPI, '/api/group/', endpoint="create_group", methods=['POST'])
 api.add_resource(GroupAPI, '/api/group/', endpoint="search_group", methods=['GET'])
+api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="get_group_id", methods=['GET'])
+api.add_resource(GroupAPI, '/api/group/<search>', endpoint="search_group_query", methods=['GET'])
 api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="delete_group", methods=['DELETE'])
+
 
 docs.register(GroupAPI, endpoint="create_group")
 docs.register(GroupAPI, endpoint="search_group")
+docs.register(GroupAPI, endpoint="get_group_id")
+docs.register(GroupAPI, endpoint="search_group_query")
 docs.register(GroupAPI, endpoint="delete_group")
+
+api.add_resource(MemberAPI, '/api/member/join/<id>', endpoint="join_group", methods=['PUT'])
+api.add_resource(MemberAPI, '/api/member/request/', endpoint="member_request", methods=['POST'])
+api.add_resource(MemberAPI, '/api/member/groups/<user_id>', endpoint="group_list", methods=['GET'])
+api.add_resource(MemberAPI, '/api/member/members/<group_id>', endpoint="member_list", methods=['GET'])
+
+
+docs.register(MemberAPI, endpoint="join_group")
+docs.register(MemberAPI, endpoint="member_request")
+docs.register(MemberAPI, endpoint="group_list")
+docs.register(MemberAPI, endpoint="member_list")
