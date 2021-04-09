@@ -252,20 +252,24 @@ class MemberAPI(MethodResource, Resource):
     @login_required
     @doc(description='GET request to get memberlist or grouplist.', tags=['Member'])
     def get(self, user_id=None, group_id=None):
-        if user_id:
-            result = dict()
-            current_user_id = current_user.id
-            # print(type(user_id))
-            if current_user_id != int(user_id):
-                result["Error"] = "Unauthorized request"
-                return jsonify(result)
-            grouplist = Member.query.filter_by(user_id = user_id)
-            return members_schema.dump(grouplist)
-        
-        if group_id:
-            members_list = Member.query.filter_by(group_id = group_id)
-            return members_schema.dump(members_list)
-        return {}
+        try:
+            if user_id:
+                result = dict()
+                current_user_id = current_user.id
+                # print(type(user_id))
+                if current_user_id != int(user_id):
+                    result["Error"] = "Unauthorized request"
+                    return jsonify(result)
+                grouplist = Member.query.filter_by(user_id = user_id)
+                return members_schema.dump(grouplist)
+            
+            if group_id:
+                members_list = Member.query.filter_by(group_id = group_id)
+                return members_schema.dump(members_list)
+        except Exception as e:
+            return jsonify({
+                "Error": str(e)
+            })
 
     @use_kwargs(MemberApprovalSchema)
     @doc(description='POST request for admin request approval feature.', tags=['Member'])   
