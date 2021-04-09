@@ -97,8 +97,22 @@
         }
 
     ],
-    "member" :
+    "members" :
     [
-        
+        {
+            "user_id": 4,
+            "group_id": 1,
+            "pending": false
+        },
+        {
+            "user_id": 4,
+            "group_id": 3,
+            "pending": false
+        },
+        {
+            "user_id": 5,
+            "group_id": 3,
+            "pending": true
+        }
     ]
 }

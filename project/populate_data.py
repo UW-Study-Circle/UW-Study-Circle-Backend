@@ -1,6 +1,6 @@
 import json
 from server import db, app
-from models import User, Group
+from models import User, Group, Member
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app.app_context().push()
@@ -10,9 +10,7 @@ with open('data.json') as f:
 
 users = data["users"]
 groups = data["groups"]
-
-
-
+members = data["members"]
 
 for user in users:
     username = user["username"]
@@ -44,6 +42,13 @@ for group in groups:
         capacity=capacity, duration=duration, status=status, admin=admin_id
         )
     db.session.add(new_group)
+
+for member in members:
+    group_id = member["group_id"]
+    user_id = member["user_id"]
+    pending = member["pending"]      
+    new_member = Member(user_id = user_id, group_id = group_id, pending = True)
+    db.session.add(new_member)
 
 db.session.commit()
 User.query.all()
