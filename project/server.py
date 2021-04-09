@@ -94,10 +94,12 @@ docs.register(GroupAPI, endpoint="search_group_query")
 docs.register(GroupAPI, endpoint="delete_group")
 
 api.add_resource(MemberAPI, '/api/member/join/<id>', endpoint="join_group", methods=['PUT'])
+api.add_resource(MemberAPI, '/api/member/request/', endpoint="member_request", methods=['POST'])
 api.add_resource(MemberAPI, '/api/member/groups/<user_id>', endpoint="group_list", methods=['GET'])
 api.add_resource(MemberAPI, '/api/member/members/<group_id>', endpoint="member_list", methods=['GET'])
 
 
 docs.register(MemberAPI, endpoint="join_group")
+docs.register(MemberAPI, endpoint="member_request")
 docs.register(MemberAPI, endpoint="group_list")
 docs.register(MemberAPI, endpoint="member_list")

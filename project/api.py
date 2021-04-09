@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_apispec import doc, use_kwargs, marshal_with
 from flask_apispec.views import MethodResource
 
-from models import User, UserSchema, Group, GroupSchema, Member, MemberSchema
+from models import User, UserSchema, Group, GroupSchema, Member, MemberSchema, MemberApprovalSchema
 user_schema = UserSchema()
 member_schema = MemberSchema()
 members_schema = MemberSchema(many=True)
@@ -155,8 +155,8 @@ class UserAPI(MethodResource, Resource):
         if user is None:
             return {"Content": "User not found"}
 
-        User.query.filter_by(id=id).delete()
         from server import db
+        db.session.delete(user)
         db.session.commit()
         result["Success"] = "User deleted"
         # print(type(result))
@@ -230,7 +230,7 @@ class GroupAPI(MethodResource, Resource):
 
     @doc(description='Delete request for delete group feature.', tags=['Group'])
     @login_required
-    def delete(self, id):
+    def delete(self, groupid):
         group = Group.query.filter_by(groupid=groupid).first()
         result = dict()
         if group is None:
@@ -238,7 +238,9 @@ class GroupAPI(MethodResource, Resource):
 
         c_user_id = current_user.id
         if c_user_id == group.admin:
-            Group.query.filter_by(groupid=groupid).delete()
+            from server import db
+            db.session.delete(group)
+            db.session.commit()
             result["Success"] = "Group deleted"
         else:
             result["Error"] = "Not admin"
@@ -251,6 +253,12 @@ class MemberAPI(MethodResource, Resource):
     @doc(description='GET request to get memberlist or grouplist.', tags=['Member'])
     def get(self, user_id=None, group_id=None):
         if user_id:
+            result = dict()
+            current_user_id = current_user.id
+            # print(type(user_id))
+            if current_user_id != int(user_id):
+                result["Error"] = "Unauthorized request"
+                return jsonify(result)
             grouplist = Member.query.filter_by(user_id = user_id)
             return members_schema.dump(grouplist)
         
@@ -258,7 +266,64 @@ class MemberAPI(MethodResource, Resource):
             members_list = Member.query.filter_by(group_id = group_id)
             return members_schema.dump(members_list)
         return {}
+
+    @use_kwargs(MemberApprovalSchema)
+    @doc(description='POST request for admin request approval feature.', tags=['Member'])   
+    @login_required
+    def post(self, **kwargs):
+        body = request.get_json()
+        if body is None:
+            return jsonify({"Error": "Data not in correct format"})
+        print(body)
         
+        result = dict()
+        error = dict()
+        try:
+            group_id = body["group_id"]
+            request_id = body["request_id"]
+            approval = body["approval"]
+            group = Group.query.get(group_id)
+            if group:
+                admin_id = group.admin
+                current_user_id = current_user.id
+                if current_user_id != int(admin_id):
+                    error["Error"] = "Unauthorized request"
+                    return jsonify(error)
+                else:
+                    request_pending = Member.query.get(request_id)
+                    if request_pending:
+                        current_status = request_pending.pending
+                        print(approval, current_status)
+                        from server import db
+                        if current_status and approval:
+                            print("Current status is pending. Approving.")
+                            result["Status"] = "Request Approved"
+                            request_pending.pending = False
+                            db.session.commit()
+
+                        elif current_status and not approval:
+                            print("Current status is pending. Denying.")
+                            result["Status"] = "Request Denied"
+                            db.session.delete(request_pending)
+                            db.session.commit()
+                        
+                        else:
+                            result["Status"] = "No change in request"                    
+                        
+                        return jsonify(result)
+                    else:
+                        error["Error"] = "Request not found"
+                        return jsonify(error)
+
+            else:
+                error["Error"] = "Group not found"
+                return jsonify(error)
+
+
+        except Exception as e:
+            error["Error"] = str(e)
+            return jsonify(error)
+            
 
     @login_required
     @doc(description='Put request for join group feature.', tags=['Member'])    
@@ -278,15 +343,17 @@ class MemberAPI(MethodResource, Resource):
                 if status == "Public": 
                     new_member = Member(user_id = user_id, group_id = group_id, pending = False)
                     print("Public group, adding member to group")
+                    result["Success"] = "Member Added"
                 else: 
                     new_member = Member(user_id = user_id, group_id = group_id, pending = True)
                     print("Public group, adding member to new member requests")
+                    result["Success"] = "Member's Request Added. Waiting for Admin Approval"
                 
                 from server import db
 
                 db.session.add(new_member)
                 db.session.commit()
-                result["Success"] = "Member Added"
+                
                 return jsonify(result)
             except Exception as e:
                 error = dict()

@@ -39,6 +39,11 @@ class MemberSchema(Schema):
     user_id = fields.Int()
     group_id = fields.Int()
     pending = fields.Bool()
+
+class MemberApprovalSchema(Schema):
+    request_id = fields.Int()
+    group_id = fields.Int()
+    approval = fields.Bool()
         
 
 class UserSchema(Schema):
