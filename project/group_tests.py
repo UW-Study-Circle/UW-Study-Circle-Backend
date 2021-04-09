@@ -101,7 +101,7 @@ class GroupTestCase(unittest.TestCase):
         res = self.client.post('/api/group/',  headers={"Content-Type": "text/plain"}, data="1234")
        
         self.assertEqual(res.status_code, 200)
-        print("eeeeeeeeeeeeeeeeeeeeeee", res.json)
+        # print("eeeeeeeeeeeeeeeeeeeeeee", res.json)
         self.assertIn("Data not in correct format", res.json['Error'])
 
     def test_same_groupname_creation(self):
@@ -176,7 +176,7 @@ class GroupTestCase(unittest.TestCase):
         res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group2)
         
         res = self.client.get('/api/group/engineering')
-        print("bbbbbbbbbbbbbbbbbbbbbbbbb", res.json['Content'])
+        # print("bbbbbbbbbbbbbbbbbbbbbbbbb", res.json['Content'])
         self.assertEqual(res.status_code, 200)
         self.assertEqual("cs506", res.json['Content'][0]['groupname'])
     
@@ -190,7 +190,7 @@ class GroupTestCase(unittest.TestCase):
         res = self.client.get('/api/group/python')
         
         self.assertEqual(res.status_code, 200)
-        print("cccccccccccccccccccccccccccccccc", res.json)
+        # print("cccccccccccccccccccccccccccccccc", res.json)
         self.assertEqual(0, len(res.json['Content']))
 
     def test_group_deletion(self):
@@ -208,7 +208,7 @@ class GroupTestCase(unittest.TestCase):
         
         res = self.client.get('/api/group/')
         self.assertEqual(res.status_code, 200)
-        print("dddddddddddddddddddddddddddddddddd", res.json)
+        # print("dddddddddddddddddddddddddddddddddd", res.json)
         self.assertEqual(1, len(res.json['Content']))
         
     
@@ -255,34 +255,12 @@ class GroupTestCase(unittest.TestCase):
         
         self.assertEqual(response2.status_code, 200)
         self.assertTrue(response2.headers['Set-Cookie'])
-        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", response2.headers)
+        # print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", response2.headers)
         
         rm = self.client.delete('/api/group/id/1')
         self.assertEqual(res.status_code, 200)
         self.assertIn("Not admin", rm.json['Error'])
         
-        
-    # def test_expection_creation(self):
-    #     """Test API create a duplicate group (POST request)"""
-    #     try:
-    #         # res = self.client.post('/api/group/',headers={"Content-Type": "application/json"},  data=self.group)
-            
-    #         group2 =  json.dumps({
-    #                 "groupname" : "cs506",
-    #                 "courseinfo": "Software Enigneering",
-    #                 "capacity": "test",
-    #                 "duration": "test1000",
-    #                 "level": "3",
-    #                 "description":"Software Engineering is a course that closely resembles the real-world. Over the course of the semester I will serve as your pilot on a 30,000 ft above sea-level tour of most things software engineering. I will take a breadth-first approach to covering the software engineering process from requirements gathering to project completion.",
-    #                 "status" : "public"
-    #         })
-            
-    #         res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=group2)
-    #         print("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrr", res.json)
-    #         # self.assertEqual(res.status_code, 200)
-    #         # self.assertIn("Group Name already exists", res.json['Duplicate'])
-    #     except Exception as e:
-    #         print("pppppppppppppppppppppppppppppp", str(e))
         
 
     def tearDown(self):
