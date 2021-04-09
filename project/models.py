@@ -44,7 +44,10 @@ class MemberApprovalSchema(Schema):
     request_id = fields.Int()
     group_id = fields.Int()
     approval = fields.Bool()
-        
+
+class ResetPasswordSchema(Schema):
+    cpwd = fields.Str()
+    npwd = fields.Str()
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
