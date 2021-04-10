@@ -32,9 +32,11 @@ class ProfileAPI(MethodResource, Resource):
             confirm_new_password = body["cnpwd"]
             if current_password == new_password:
                 result["Failure"] = "New Password and Current Password cannot be same. Try Again"
+                return jsonify(result)
 
             if new_password != confirm_new_password:
                 result["Failure"] = "New Password and Confirm New password does not match. Try Again"
+                return jsonify(result)
 
             # print(user.password)
             if check_password_hash(user.password, current_password):
