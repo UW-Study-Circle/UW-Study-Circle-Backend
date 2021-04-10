@@ -182,11 +182,7 @@ class UserAPI(MethodResource, Resource):
         result = dict()
             
         result["Content"] = user_schema.dump(user)
-<<<<<<< HEAD
         result["Success"] = "Success searching for user"
-=======
-        result["Message"] = "Success searching for user"
->>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
         # print(type(result))
         return jsonify(result)
 
@@ -196,30 +192,16 @@ class UserAPI(MethodResource, Resource):
         '''
         Delete method for User deletion
         '''
-<<<<<<< HEAD
         try:    
             current_id = current_user.id
             if int(id) != current_id:
                 return jsonify({"Error": "Incorrect User ID"})
         except:
             return jsonify({"Error": "Incorrect or Null ID"})
-=======
-        try:
-            current_id = current_user.id
-            if int(id) != current_id:
-                return jsonify({"Error": "Incorrect User ID"})
-        except Exception as e:
-                return jsonify({"Error": "Invalid input for User ID"})
->>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
         user = User.query.filter_by(id=id).first()
         result = dict()
         if user is None:
             return {"Content": "User not found"}
-<<<<<<< HEAD
-
-=======
-        User.query.filter_by(id=id).delete()
->>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
         from server import db
         db.session.delete(user)
         db.session.commit()
