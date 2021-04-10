@@ -8,7 +8,7 @@ from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 from flask_login import LoginManager 
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import os
 
 
@@ -59,6 +59,7 @@ from api import *
 docs = FlaskApiSpec(app)
 api = Api(app)
 CORS(app, supports_credentials=True)
+cross_origin(['http://localhost:8080'])
 
 api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
