@@ -61,6 +61,7 @@ docs = FlaskApiSpec(app)
 api = Api(app)
 CORS(app, supports_credentials=True)
 
+
 api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
 api.add_resource(ProfileAPI, '/api/profile/reset/', endpoint="reset_password", methods=['PUT'])
@@ -69,6 +70,7 @@ api.add_resource(ProfileAPI, '/api/login/', endpoint="login_user", methods=['POS
 
 docs.register(ProfileAPI, endpoint="profile")
 docs.register(ProfileAPI, endpoint="reset_password")
+
 docs.register(ProfileAPI, endpoint="profile_id")
 docs.register(ProfileAPI, endpoint="login_user")
 docs.register(ProfileAPI, endpoint="logout")
