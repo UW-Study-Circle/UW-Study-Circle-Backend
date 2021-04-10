@@ -11,6 +11,7 @@ class ProfileAPITest(unittest.TestCase):
     def setUp(self):
         "Set up Profile API test fixtures"
         print('### Setting up flask server ###')
+<<<<<<< HEAD
         with app.app_context():
             # create all tables
             db.create_all()
@@ -26,6 +27,8 @@ class ProfileAPITest(unittest.TestCase):
         })
         response = self.client.post('/api/user/', headers={"Content-Type": "application/json"}, data=self.payload)
 
+=======
+>>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
     def test_successful_get_user_profile_by_id(self):
         """Test getting the logged-in user's profile"""
         response = self.client.post(
@@ -36,8 +39,14 @@ class ProfileAPITest(unittest.TestCase):
             )),
             content_type='application/json'
         )
+<<<<<<< HEAD
         response = self.client.get('/id/1', headers={"Content-Type": "application/json"})
         # print(response.json)
+=======
+        response = self.client.get('/id/10', headers={"Content-Type": "application/json"})
+        # print(response.json)
+        self.assertTrue(response.json['Message'] == "Successfully fetched user profile.")
+>>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
         self.assertTrue(response.json['username'] == "wisc_user001")
         self.assertTrue(response.json['firstname'] == "Bucky")
         self.assertTrue(response.json['lastname'] == "Badger")
@@ -54,6 +63,10 @@ class ProfileAPITest(unittest.TestCase):
         )
         response = self.client.get('/id/null', headers={"Content-Type": "application/json"})
         # print(response.json)
+<<<<<<< HEAD
+=======
+        self.assertTrue(response.json['Message'] == "Sorry, couldn't fetch user profile.")
+>>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
         self.assertTrue(response.json['username'] == None)
         self.assertEqual(response.status_code, 200)
 
@@ -76,7 +89,10 @@ class ProfileAPITest(unittest.TestCase):
         response = self.client.get('/api/logout/true',content_type='application/json')
         self.assertIn(b'Logout Successful!', response.data)
         self.assertEqual(response.status_code, 200)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
     def test_registered_successful_login(self):
         """ Test for login of non-registered user """
         response = self.client.post(
@@ -88,7 +104,12 @@ class ProfileAPITest(unittest.TestCase):
             content_type='application/json'
         )
         # print(response.json)
+<<<<<<< HEAD
         self.assertTrue(response.json["Success"] == "Login Successful")
+=======
+        self.assertTrue(response.json["Status"] == "Pass")
+        self.assertTrue(response.json['Message'] == "User exists and correct credentials")
+>>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
         self.assertEqual(response.status_code, 200)
 
 
@@ -102,7 +123,12 @@ class ProfileAPITest(unittest.TestCase):
             )),
             content_type='application/json'
         )
+<<<<<<< HEAD
         self.assertTrue(response.json["Content"] == None)
+=======
+        self.assertTrue(response.json["Status"] == "Fail")
+        self.assertTrue(response.json['Message'] == "User does not exist or password is wrong.")
+>>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
         self.assertEqual(response.status_code, 200)
 
     def test_get_profile_unauthenticated(self):
@@ -123,6 +149,7 @@ class ProfileAPITest(unittest.TestCase):
         )
         response = self.client.get('/', content_type='application/json')
         self.assertEqual(response.status_code, 200)
+<<<<<<< HEAD
     def test_put_reset_request_successful(self, **kwargs):
         """Test for putting successful reset request"""
         response = self.client.post(
@@ -218,5 +245,11 @@ class ProfileAPITest(unittest.TestCase):
             # drop all tables
             db.session.remove()
             db.drop_all()
+=======
+
+    def tearDown(self):
+        "Tear down Profile API test fixtures"
+        print('### Tearing down the flask server ###')
+>>>>>>> 794d8a521cebaf79625f5aa4abf2635516a1d87c
 if __name__ == "__main__":
         unittest.main(verbosity = 2)
