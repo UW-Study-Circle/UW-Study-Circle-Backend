@@ -89,7 +89,7 @@ api.add_resource(GroupAPI, '/api/group/', endpoint="create_group", methods=['POS
 api.add_resource(GroupAPI, '/api/group/', endpoint="search_group", methods=['GET'])
 api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="get_group_id", methods=['GET'])
 api.add_resource(GroupAPI, '/api/group/<search>', endpoint="search_group_query", methods=['GET'])
-api.add_resource(GroupAPI, '/api/group/id/<groupid>', endpoint="delete_group", methods=['DELETE'])
+api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="delete_group", methods=['DELETE'])
 
 
 docs.register(GroupAPI, endpoint="create_group")
