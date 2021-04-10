@@ -30,9 +30,13 @@ class ProfileAPI(MethodResource, Resource):
             current_password = body["cpwd"]
             new_password = body["npwd"]
             confirm_new_password = body["cnpwd"]
+            if current_password == new_password:
+                result["Failure"] = "New Password and Current Password cannot be same. Try Again"
+
             if new_password != confirm_new_password:
                 result["Failure"] = "New Password and Confirm New password does not match. Try Again"
-            print(user.password)
+
+            # print(user.password)
             if check_password_hash(user.password, current_password):
                 user.password = generate_password_hash(new_password, method='sha256')
                 result["Success"] = "New Password set successfully!"
