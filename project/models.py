@@ -48,6 +48,7 @@ class MemberApprovalSchema(Schema):
 class ResetPasswordSchema(Schema):
     cpwd = fields.Str()
     npwd = fields.Str()
+    cnpwd = fields.Str()
 
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)

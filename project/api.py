@@ -16,7 +16,7 @@ single_group_schema = GroupSchema()
 from flask_login import login_user, logout_user, login_required, current_user
 
 class ProfileAPI(MethodResource, Resource):
-    # @login_required
+    @login_required
     @doc(description='Put request for password reset.', tags=['User-Profile'])    
     @use_kwargs(ResetPasswordSchema)
     def put(self, **kwargs):
@@ -29,6 +29,9 @@ class ProfileAPI(MethodResource, Resource):
             print(body)
             current_password = body["cpwd"]
             new_password = body["npwd"]
+            confirm_new_password = body["cnpwd"]
+            if new_password != confirm_new_password:
+                result["Failure"] = "New Password and Confirm New password does not match. Try Again"
             print(user.password)
             if check_password_hash(user.password, current_password):
                 user.password = generate_password_hash(new_password, method='sha256')
