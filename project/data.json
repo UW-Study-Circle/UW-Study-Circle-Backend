@@ -94,6 +94,17 @@
             "groupname": "Paper Discussion",
             "level": "Advanced",
             "status": "Private"
+        },
+
+        {
+            "admin": 2,
+            "capacity": 50,
+            "courseinfo": "cs-536",
+            "description": "Compiler",
+            "duration": 0,
+            "groupname": "Compiler",
+            "level": "Advanced",
+            "status": "Public"
         }
 
     ],
@@ -102,7 +113,7 @@
         {
             "user_id": 4,
             "group_id": 1,
-            "pending": false
+            "pending": true
         },
         {
             "user_id": 4,
@@ -113,6 +124,22 @@
             "user_id": 5,
             "group_id": 3,
             "pending": true
+        },
+
+        {
+            "user_id": 1,
+            "group_id": 1,
+            "pending": true
+        },
+        {
+            "user_id": 1,
+            "group_id": 2,
+            "pending": false
+        },
+        {
+            "user_id": 2,
+            "group_id": 2,
+            "pending": false
         }
     ]
 }
