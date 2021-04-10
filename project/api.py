@@ -104,6 +104,7 @@ class ProfileAPI(MethodResource, Resource):
         except Exception as e:
             result["Error"] = str(e)
         # print(type(result))
+        result["Success"] = "Login Successful"
         return jsonify(result)
 
 
@@ -171,6 +172,7 @@ class UserAPI(MethodResource, Resource):
         result = dict()
             
         result["Content"] = user_schema.dump(user)
+        result["Success"] = "Success searching for user"
         # print(type(result))
         return jsonify(result)
 
@@ -180,11 +182,12 @@ class UserAPI(MethodResource, Resource):
         '''
         Delete method for User deletion
         '''
-        current_id = current_user.id
-
-        if int(id) != current_id:
-            return jsonify({"Error": "Incorrect User ID"})
-
+        try:    
+            current_id = current_user.id
+            if int(id) != current_id:
+                return jsonify({"Error": "Incorrect User ID"})
+        except:
+            return jsonify({"Error": "Incorrect or Null ID"})
         user = User.query.filter_by(id=id).first()
         result = dict()
         if user is None:
