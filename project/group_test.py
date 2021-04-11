@@ -1,15 +1,7 @@
 import unittest
 import json
 from server import app, db
-import os
-from flask.testing import FlaskClient
-import requests
-from sqlalchemy_utils import database_exists
-from flask_login import login_user, logout_user, login_required, current_user
-# from populate_data import *
-# from app import create_app, db
-import base64
-from models import User, Group
+
 
 class GroupTestCase(unittest.TestCase):
     """This class represents the group test case"""

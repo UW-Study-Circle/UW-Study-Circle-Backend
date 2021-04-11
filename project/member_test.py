@@ -1,8 +1,6 @@
 import unittest
 import json
 from server import app, db
-import os
-from flask.testing import FlaskClient
 from populate_data import *
 
 
