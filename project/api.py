@@ -277,7 +277,7 @@ class GroupAPI(MethodResource, Resource):
     @doc(description='Delete request for delete group feature.', tags=['Group'])
     @login_required
     def delete(self, groupid):
-        group = Group.query.filter_by(groupid=groupid).first()
+        group = Group.query.filter_by(id=groupid).first()
         result = dict()
         if group is None:
             return {"Content": "Group not found"}
