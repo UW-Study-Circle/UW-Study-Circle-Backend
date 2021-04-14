@@ -8,3 +8,5 @@ marshmallow
 marshmallow-jsonapi
 flask-apispec
 flask-cors
+coverage
+flask-socketio
