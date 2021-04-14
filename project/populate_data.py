@@ -54,3 +54,5 @@ def populate_data():
     db.session.commit()
     User.query.all()
     Group.query.all()
+
+populate_data()
