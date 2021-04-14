@@ -1,5 +1,6 @@
 # init.py
 from flask import Flask
+from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
 from flask_mail import Mail
@@ -40,6 +41,7 @@ app.config['MAIL_PASSWORD'] = '150724yan'#os.environ.get('EMAIL_PASSWORD')
 mail = Mail(app)
 
 db.init_app(app)
+socketio = SocketIO(app)
 from models import User, Group, Member
 
 with app.app_context():
