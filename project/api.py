@@ -237,9 +237,16 @@ class GroupAPI(MethodResource, Resource):
                 groupname=groupname, courseinfo=courseinfo, level=level, description=description,
                 capacity=capacity, duration=duration, status=status, admin=admin_id)
             # add the new group to the database
+
             from server import db
 
             db.session.add(new_group)
+            db.session.commit()
+
+            print(new_group)
+            new_member = Member(user_id = admin_id, group_id = new_group.id, pending = False)
+            # add admin to member list
+            db.session.add(new_member)
             db.session.commit()
             result["Success"] = "Group created"
             return jsonify(result)
@@ -387,6 +394,10 @@ class MemberAPI(MethodResource, Resource):
                 status = group.status
                 group_id = group.id
                 member_exist = Member.query.filter_by(user_id = user_id, group_id = group_id).first() 
+
+                if group.admin == user_id:
+                    return jsonify({"Error": "Admin already member of the group"})
+
                 if member_exist:
                     return jsonify({"Error": "Member already Exists"})
 
