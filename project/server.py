@@ -1,6 +1,5 @@
 # init.py
-from flask import Flask
-from flask_socketio import SocketIO
+from flask import Flask, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
 from flask_mail import Mail
@@ -10,6 +9,7 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 from flask_login import LoginManager 
 from flask_cors import CORS, cross_origin
+from flask_socketio import SocketIO
 import os
 
 
@@ -59,9 +59,12 @@ def load_user(user_id):
 from api import *
 
 docs = FlaskApiSpec(app)
-api = Api(app)
+api_bp = Blueprint('api', __name__)
+api = Api(api_bp)
+
 CORS(app, supports_credentials=True)
 cross_origin(['http://localhost:8080'])
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
@@ -69,21 +72,9 @@ api.add_resource(ProfileAPI, '/api/profile/reset/', endpoint="reset_password", m
 api.add_resource(ProfileAPI, '/api/logout/<logout>', endpoint="logout", methods=['GET'])
 api.add_resource(ProfileAPI, '/api/login/', endpoint="login_user", methods=['POST'])
 
-docs.register(ProfileAPI, endpoint="profile")
-docs.register(ProfileAPI, endpoint="reset_password")
-docs.register(ProfileAPI, endpoint="profile_id")
-docs.register(ProfileAPI, endpoint="login_user")
-docs.register(ProfileAPI, endpoint="logout")
-
-
-
 api.add_resource(UserAPI, '/api/user/', endpoint="create_user", methods=['POST'])
 api.add_resource(UserAPI, '/api/user/email/<email>/password/<password>', endpoint="search_user", methods=['GET'])
 api.add_resource(UserAPI, '/api/user/id/<id>', endpoint="delete_user", methods=['DELETE'])
-
-docs.register(UserAPI, endpoint="create_user")
-docs.register(UserAPI, endpoint="search_user")
-docs.register(UserAPI, endpoint="delete_user")
 
 api.add_resource(GroupAPI, '/api/group/', endpoint="create_group", methods=['POST'])
 api.add_resource(GroupAPI, '/api/group/', endpoint="search_group", methods=['GET'])
@@ -91,20 +82,33 @@ api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="get_group_id", method
 api.add_resource(GroupAPI, '/api/group/<search>', endpoint="search_group_query", methods=['GET'])
 api.add_resource(GroupAPI, '/api/group/id/<groupid>', endpoint="delete_group", methods=['DELETE'])
 
-
-docs.register(GroupAPI, endpoint="create_group")
-docs.register(GroupAPI, endpoint="search_group")
-docs.register(GroupAPI, endpoint="get_group_id")
-docs.register(GroupAPI, endpoint="search_group_query")
-docs.register(GroupAPI, endpoint="delete_group")
-
 api.add_resource(MemberAPI, '/api/member/join/<id>', endpoint="join_group", methods=['PUT'])
 api.add_resource(MemberAPI, '/api/member/request/', endpoint="member_request", methods=['POST'])
 api.add_resource(MemberAPI, '/api/member/groups/<user_id>', endpoint="group_list", methods=['GET'])
 api.add_resource(MemberAPI, '/api/member/members/<group_id>', endpoint="member_list", methods=['GET'])
 
 
-docs.register(MemberAPI, endpoint="join_group")
-docs.register(MemberAPI, endpoint="member_request")
-docs.register(MemberAPI, endpoint="group_list")
-docs.register(MemberAPI, endpoint="member_list")
+from chat import chat
+
+app.register_blueprint(api_bp)
+app.register_blueprint(chat)
+
+docs.register(ProfileAPI, endpoint="reset_password", blueprint="api")
+docs.register(ProfileAPI, endpoint="profile_id", blueprint="api")
+docs.register(ProfileAPI, endpoint="login_user", blueprint="api")
+docs.register(ProfileAPI, endpoint="logout", blueprint="api")
+
+docs.register(UserAPI, endpoint="create_user", blueprint="api")
+docs.register(UserAPI, endpoint="search_user", blueprint="api")
+docs.register(UserAPI, endpoint="delete_user", blueprint="api")
+
+docs.register(GroupAPI, endpoint="create_group", blueprint="api")
+docs.register(GroupAPI, endpoint="search_group", blueprint="api")
+docs.register(GroupAPI, endpoint="get_group_id", blueprint="api")
+docs.register(GroupAPI, endpoint="search_group_query", blueprint="api")
+docs.register(GroupAPI, endpoint="delete_group", blueprint="api")
+
+docs.register(MemberAPI, endpoint="join_group", blueprint="api")
+docs.register(MemberAPI, endpoint="member_request", blueprint="api")
+docs.register(MemberAPI, endpoint="group_list", blueprint="api")
+docs.register(MemberAPI, endpoint="member_list", blueprint="api")
