@@ -18,7 +18,6 @@ import os
 db = SQLAlchemy()
 
 app = Flask(__name__)
-socketio = SocketIO(app)
 
 app.config.update({
     'APISPEC_SPEC': APISpec(
@@ -64,6 +63,7 @@ api = Api(api_bp)
 
 CORS(app, supports_credentials=True)
 cross_origin(['http://localhost:8080'])
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
