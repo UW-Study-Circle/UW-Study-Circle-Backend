@@ -65,7 +65,7 @@ CORS(app, supports_credentials=True)
 cross_origin(['http://localhost:8080'])
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
+api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
 api.add_resource(ProfileAPI, '/api/profile/reset/', endpoint="reset_password", methods=['PUT'])
 api.add_resource(ProfileAPI, '/api/logout/<logout>', endpoint="logout", methods=['GET'])

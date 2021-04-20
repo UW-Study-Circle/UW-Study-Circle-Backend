@@ -12,11 +12,12 @@ chat = Blueprint('chat', __name__)
 def messageReceived(methods=['GET', 'POST']):
     print('message was received!!!')
 
-@chat.route('/', methods=["GET", "POST"])
+@chat.route('/demo', methods=["GET", "POST"])
 def sessions():
     return render_template('chat.html')
 
 @socketio.on('my event')
 def handle_my_custom_event(json, methods=['GET', 'POST']):
+    print(current_user)
     print('received my event: ' + str(json))
     socketio.emit('my response', json, callback=messageReceived)
