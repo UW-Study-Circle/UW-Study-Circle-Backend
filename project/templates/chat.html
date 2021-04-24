@@ -1,6 +1,46 @@
 <html>
     <head>
         <title>UW-Madison Study Circle Chat Room: {{ room }}</title>
+        <style>
+            body {
+              font-family: sans-serif;
+            }
+            
+            h1 {
+              color: rgb(23, 162, 184);
+              margin-left: 40px;
+            }
+            h3 {
+                font-size: 15;
+                font-family: sans-serif;
+            }
+            .button {
+                background-color:rgb(23, 162, 184);
+                border: none;
+                padding: 15px 25px;
+                color: white;
+                text-align: center;
+                display: inline-block;
+                cursor: pointer;
+            }
+            .button1 {
+                background-color:rgb(237, 94, 104);
+                border: none;
+                padding: 15px 25px;
+                color: white;
+                text-align: center;
+                display: inline-block;
+                cursor: pointer;
+            }
+            .button:hover {
+                background-color:#228999;
+            }
+            .button1:hover {
+                background-color:#b82b00;
+            }
+        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://kit.fontawesome.com/a076d05399.js"></script>
         <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
         <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
         <script type="text/javascript" charset="utf-8">
@@ -11,7 +51,7 @@
                     socket.emit('joined', {});
                 });
                 socket.on('status', function(data) {
-                    $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
+                    $('#chat').val($('#chat').val() + '***' + data.msg + '***\n');
                     $('#chat').scrollTop($('#chat')[0].scrollHeight);
                 });
                 socket.on('message', function(data) {
@@ -39,9 +79,12 @@
     </head>
     <body>
         <h1>UW-Madison Study Circle Chat: {{ room }}</h1>
-        <textarea id="chat" cols="80" rows="20"></textarea><br><br>
-        <input id="text" size="80" placeholder="Enter your message here"><br><br>
+        <h3><i class="fas fa-users"></i> Start connecting with other students</h3>
+        <textarea name="styled-textarea" id="chat" cols="80" rows="20" style="border:solid 1.5px rgb(252, 71, 71); resize: none; font-family: sans-serif; 
+        background-color: #f0f4ff; height: 400px; padding: 9px;" readonly></textarea><br><br>
+        <input id="text" size="80" placeholder="Enter your message here" style="border:solid 1.5px rgb(252, 71, 71); padding: 3; width: auto; font-family: sans-serif;"><br><br>
         <!-- <a href="index" onclick="leave_room();">Leave this room</a> -->
-        <input type="button" onclick="leave_room();" value="Leave this room" />
+        <input type="button" class="button" onclick="leave_room();" value="Go back" />
+        <input type="button" class="button1" onclick="leave_room();" value="Delete last message for everyone" />
     </body>
 </html>
