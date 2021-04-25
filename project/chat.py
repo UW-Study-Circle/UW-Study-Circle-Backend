@@ -5,11 +5,13 @@ from flask import Blueprint, session, redirect, url_for, render_template, reques
 
 from flask_login import login_user, logout_user, login_required, current_user
 from server import socketio
+from models import Group, GroupSchema, Message, Member
 
 from flask_wtf import FlaskForm
 from wtforms.fields import StringField, SubmitField
 from wtforms.validators import DataRequired
 
+from sqlalchemy import desc
 
 chat = Blueprint('chat', __name__)
 
@@ -28,25 +30,36 @@ class LoginForm(FlaskForm):
 def sessions():
     """Chat room. The user's name and room must be stored in
     the session."""
-    name = session.get('name', '')
-    room = session.get('room', '')
-    if name == '' or room == '':
-        return render_template('index.html')
+    groupid = request.args.get('groupid')
+    group = Group.query.get(groupid)
+    name = ""
+    room = ""
+    # Get the user id from current user, check member model exists and pending false, part of group
+    if group:
+        if current_user.is_authenticated:
+            name = current_user.username
+            room = group.groupname
+            session['room'] = group.groupname
+            session['name'] = name
+        else:
+            return {'Error': 'Unauthenticated'}
+    else:
+        return {"Error": "Group not found"}
     return render_template('chat.html', name=name, room=room)
 
 
-@chat.route('/chatlogin', methods=["GET", "POST"])
-def index():
-    """Login form to enter a room."""
-    form = LoginForm()
-    if form.validate_on_submit():
-        session['name'] = form.name.data
-        session['room'] = form.room.data
-        return render_template('chat.html', room=session['room'])
-    elif request.method == 'GET':
-        form.name.data = session.get('name', '')
-        form.room.data = session.get('room', '')
-    return render_template('index.html', form=form)
+# @chat.route('/chatlogin', methods=["GET", "POST"])
+# def index():
+#     """Login form to enter a room."""
+#     form = LoginForm()
+#     if form.validate_on_submit():
+#         session['name'] = form.name.data
+#         session['room'] = form.room.data
+#         return render_template('chat.html', room=session['room'])
+#     elif request.method == 'GET':
+#         form.name.data = session.get('name', '')
+#         form.room.data = session.get('room', '')
+#     return render_template('index.html', form=form)
 
 @socketio.on('joined', namespace='/chat')
 def joined(message):
@@ -55,6 +68,8 @@ def joined(message):
     room = session.get('room')
     join_room(room)
     emit('status', {'msg': session.get('name') + ' joined the group'}, room=room)
+    groupid = request.args.get('groupid')
+    msghistory = Message.query.filter_by(group_id=groupid).order_by(desc(Message.id)).limit(20)
 
 
 @socketio.on('text', namespace='/chat')
