@@ -51,11 +51,11 @@
                     socket.emit('joined', {});
                 });
                 socket.on('status', function(data) {
-                    $('#chat').val($('#chat').val() + '***' + data.msg + '***\n');
+                    $('#chat').val($('#chat').val() + '***' + data.msg + '***\n\n');
                     $('#chat').scrollTop($('#chat')[0].scrollHeight);
                 });
                 socket.on('message', function(data) {
-                    $('#chat').val($('#chat').val() + data.msg + '\n');
+                    $('#chat').val($('#chat').val() + '        '+ data.msg + '\n');
                     $('#chat').scrollTop($('#chat')[0].scrollHeight);
                 });
                 $('#text').keypress(function(e) {
@@ -81,10 +81,12 @@
         <h1>UW-Madison Study Circle Chat: {{ room }}</h1>
         <h3><i class="fas fa-users"></i> Start connecting with other students</h3>
         <textarea name="styled-textarea" id="chat" cols="80" rows="20" style="border:solid 1.5px rgb(252, 71, 71); resize: none; font-family: sans-serif; 
-        background-color: #f0f4ff; height: 400px; padding: 9px;" readonly></textarea><br><br>
+        background-color: #f0f4ff; height: 400px; padding: 5px;" readonly>
+        {% for msg in messages %}
+        {{ messages[msg][1] }}: {{ messages[msg][0] }}
+        {% endfor %}
+        </textarea><br><br>
         <input id="text" size="80" placeholder="Enter your message here" style="border:solid 1.5px rgb(252, 71, 71); padding: 3; width: auto; font-family: sans-serif;"><br><br>
-        <!-- <a href="index" onclick="leave_room();">Leave this room</a> -->
         <input type="button" class="button" onclick="leave_room();" value="Go back" />
-        <input type="button" class="button1" onclick="leave_room();" value="Delete last message for everyone" />
     </body>
 </html>

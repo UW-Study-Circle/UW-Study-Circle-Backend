@@ -31,7 +31,7 @@ class Group(UserMixin, db.Model):
 class Message(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String(256))
-    user_id = db.Column(db.Integer)
+    user_name = db.Column(db.String(256))
     group_id = db.Column(db.Integer)
 
 class MessageSchema(Schema):
