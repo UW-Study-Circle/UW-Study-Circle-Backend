@@ -11,30 +11,22 @@ from flask_wtf import FlaskForm
 from wtforms.fields import StringField, SubmitField
 from wtforms.validators import DataRequired
 
-from sqlalchemy import desc
+from sqlalchemy import desc, asc, func
 
 chat = Blueprint('chat', __name__)
-
-class LoginForm(FlaskForm):
-    """Accepts a nickname and a room."""
-    name = StringField('Name', validators=[DataRequired()])
-    room = StringField('Room', validators=[DataRequired()])
-    submit = SubmitField('Enter Chatroom')
-
-
-# @chat.route('/chat', methods=["GET", "POST"])
-# def messageReceived(methods=['GET', 'POST']):
-#     print('message was received!!!')
 
 @chat.route('/chat', methods=["GET", "POST"])
 def sessions():
     """Chat room. The user's name and room must be stored in
     the session."""
     groupid = request.args.get('groupid')
+    uid = current_user.id
+    userGroups = Member.query.filter_by(user_id=uid, group_id=groupid, pending=0)
+    if userGroups.count() == 0:
+        return {'Error': 'User not authorized'}
     group = Group.query.get(groupid)
     name = ""
     room = ""
-    # Get the user id from current user, check member model exists and pending false, part of group
     if group:
         if current_user.is_authenticated:
             name = current_user.username
@@ -47,8 +39,9 @@ def sessions():
             return {'Error': 'Unauthenticated'}
     else:
         return {"Error": "Group not found"}
-    result = Message.query.all()
-    # result = Message.query.filter_by(group_id=groupid).order_by(desc(Message.id)).limit(20)
+    # result = Message.query.all()
+    msgSorted = Message.query.filter_by(group_id=groupid).order_by(desc(Message.id)).limit(20)
+    result = msgSorted.from_self().order_by(asc(Message.id))
     messages = {}
     for i in result:
         messages[i.id] = (i.message,i.user_name)
@@ -64,15 +57,6 @@ def joined(message):
     room = session.get('room')
     join_room(room)
     emit('status', {'msg': session.get('name') + ' joined the group'}, room=room)
-    groupid = request.args.get('groupid')
-    # print(groupid)
-    # msghistory = Message.query.filter_by(group_id=groupid).order_by(desc(Message.id)).limit(20)
-    # msghistory = Message.query.filter_by(group_id=groupid)
-    # message = Message(message=message)
-    # # Takes message and adds to db
-    # db.session.add(message)
-    # # Save changes
-    # db.session.commit()
 
 
 @socketio.on('text', namespace='/chat')
@@ -83,7 +67,6 @@ def text(message):
     name = session.get('name')
     group_id=session.get('group_id')
     user_id=session.get('user_id')
-    print(type(message))
     newmessage = Message(message=message['msg'],user_name=name,group_id=group_id)
     # Takes message and adds to db
     db.session.add(newmessage)
