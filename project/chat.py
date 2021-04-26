@@ -23,7 +23,7 @@ def sessions():
     uid = current_user.id
     userGroups = Member.query.filter_by(user_id=uid, group_id=groupid, pending=0)
     if userGroups.count() == 0:
-        return {'Error': 'User not authorized'}
+        return {'Error': 'User not authorized or Group not found'}
     group = Group.query.get(groupid)
     name = ""
     room = ""
