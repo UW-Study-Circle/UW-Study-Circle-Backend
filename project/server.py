@@ -41,7 +41,7 @@ app.config['MAIL_PASSWORD'] = '150724yan'#os.environ.get('EMAIL_PASSWORD')
 mail = Mail(app)
 
 db.init_app(app)
-socketio = SocketIO(app)
+# socketio = SocketIO(app)
 from models import User, Group, Member
 
 with app.app_context():
@@ -62,9 +62,9 @@ docs = FlaskApiSpec(app)
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
 
-CORS(app, supports_credentials=True)
 cross_origin(['http://localhost:8080'])
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", cors_credentials=True)
+CORS(app, supports_credentials=True)
 
 api.add_resource(ProfileAPI, '/', endpoint="profile", methods=['GET'])
 api.add_resource(ProfileAPI, '/id/<id>', endpoint="profile_id", methods=['GET'])
@@ -94,6 +94,7 @@ app.register_blueprint(api_bp)
 app.register_blueprint(chat)
 
 docs.register(ProfileAPI, endpoint="reset_password", blueprint="api")
+docs.register(ProfileAPI, endpoint="profile", blueprint="api")
 docs.register(ProfileAPI, endpoint="profile_id", blueprint="api")
 docs.register(ProfileAPI, endpoint="login_user", blueprint="api")
 docs.register(ProfileAPI, endpoint="logout", blueprint="api")
