@@ -105,6 +105,17 @@
             "groupname": "Compiler",
             "level": "Advanced",
             "status": "Public"
+        },
+
+        {
+            "admin": 3,
+            "capacity": 50,
+            "courseinfo": "cs-537",
+            "description": "OS",
+            "duration": 0,
+            "groupname": "OS",
+            "level": "Advanced",
+            "status": "Private"
         }
 
     ],
@@ -145,6 +156,16 @@
             "user_id": 2,
             "group_id": 2,
             "pending": false
+        },
+        {
+            "user_id": 1,
+            "group_id": 2,
+            "pending": true
+        },
+        {
+            "user_id": 1,
+            "group_id": 3,
+            "pending": true
         }
     ]
 }
