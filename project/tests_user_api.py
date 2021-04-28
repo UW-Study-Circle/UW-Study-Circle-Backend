@@ -98,10 +98,28 @@ class UserAPITest(unittest.TestCase):
             )),
             content_type='application/json'
         )
-        # When logged in user tries to delete user doesn't exist
+        
+        payload2 = json.dumps({
+            "username": "wisc_user002", 
+            "password": "*Bucky_W1ns!",
+            "email": "bucky2@wisc.edu",
+            "lastname": "Badger",
+            "firstname": "Bucky",
+            "gender": "Male",
+            "phonenumber": "123456789",
+            "bday": "28-01-1995"
+        })
+        response = self.client.post('/api/user/', headers={"Content-Type": "application/json"}, data=payload2)
         response = self.client.delete('/api/user/id/2', headers={"Content-Type": "application/json"})
-        # Then
         self.assertTrue(response.json['Error'] == "Incorrect User ID")
+        # Then
+        self.assertEqual(200, response.status_code)
+        
+        
+        # When logged in user tries to delete user doesn't exist
+        response = self.client.delete('/api/user/id/3', headers={"Content-Type": "application/json"})
+        # Then
+        self.assertTrue(response.json['Content'] == "User not found")
         self.assertEqual(200, response.status_code)
 
         # When passing invalid input like null
@@ -116,6 +134,12 @@ class UserAPITest(unittest.TestCase):
         print(response.json)
         self.assertTrue(response.json == None)
         self.assertEqual(404, response.status_code)
+        
+        
+        
+        
+        
+        
     def test_successful_search_user(self):
         response = self.client.post('/api/user/', headers={"Content-Type": "application/json"}, data=self.payload)
         response = self.client.get('/api/user/email/bucky@wisc.edu/password/*Bucky_W1ns!', headers={"Content-Type": "application/json"})
@@ -135,6 +159,8 @@ class UserAPITest(unittest.TestCase):
         # Then
         self.assertTrue(response.json == None)
         self.assertEqual(404, response.status_code)
+        
+        
     def test_user_creation_with_none_json(self):
         
         res = self.client.post('/api/user/',  headers={"Content-Type": "text/plain"}, data="1234")
