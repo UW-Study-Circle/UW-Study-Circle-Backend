@@ -791,8 +791,8 @@ class MemberTestCase(unittest.TestCase):
         
     def test_member_request_with__private_group_and_approved(self):
         member = json.dumps({
-                "group_id": 2,
-                "request_id": 11,
+                "group_id": 5,
+                "request_id": 12,
                 "approval": True
         })
         
@@ -804,8 +804,8 @@ class MemberTestCase(unittest.TestCase):
 
     def test_member_request_with_private_group_and_not_approved(self):
         member = json.dumps({
-                "group_id": 2,
-                "request_id": 11,
+                "group_id": 5,
+                "request_id": 12,
                 "approval": False
         })
         
@@ -832,7 +832,7 @@ class MemberTestCase(unittest.TestCase):
     def test_put_admin_into_joined_group(self):
        
 
-        res = self.client.put('/api/member/join/1')
+        res = self.client.put('/api/member/join/2')
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual("Admin already member of the group", res.json['Error'])
@@ -862,8 +862,18 @@ class MemberTestCase(unittest.TestCase):
         
     def test_put_members_into_private_group(self):
       
+        # print(response.json)
+        response = self.client.get('/api/logout/true',content_type='application/json')
+        response = self.client.post(
+            '/api/login/',
+            data=json.dumps(dict(
+                email='p@e.c',
+                password='aaaa'
+            )),
+            content_type='application/json'
+        )
 
-        res = self.client.put('/api/member/join/5')
+        res = self.client.put('/api/member/join/3')
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual("Member's Request Added. Waiting for Admin Approval", res.json['Success'])

@@ -108,12 +108,12 @@
         },
 
         {
-            "admin": 3,
+            "admin": 1,
             "capacity": 50,
             "courseinfo": "cs-537",
-            "description": "OS",
+            "description": "Operating System",
             "duration": 0,
-            "groupname": "OS",
+            "groupname": "Operating System",
             "level": "Advanced",
             "status": "Private"
         }
@@ -174,12 +174,12 @@
         },
         {
             "user_id": 1,
-            "group_id": 2,
-            "pending": false
+            "group_id": 3,
+            "pending": true
         },
         {
             "user_id": 1,
-            "group_id": 3,
+            "group_id": 5,
             "pending": true
         }
     ]
