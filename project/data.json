@@ -124,7 +124,7 @@
         {
             "user_id": 4,
             "group_id": 1,
-            "pending": true
+            "pending": false
         },
         {
             "user_id": 4,
@@ -175,7 +175,7 @@
         {
             "user_id": 1,
             "group_id": 2,
-            "pending": true
+            "pending": false
         },
         {
             "user_id": 1,
