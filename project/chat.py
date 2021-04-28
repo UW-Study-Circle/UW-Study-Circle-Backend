@@ -1,7 +1,7 @@
 from flask_socketio import SocketIO
 from flask_socketio import emit, join_room, leave_room
 
-from flask import Blueprint, session, redirect, url_for, render_template, request
+from flask import Blueprint, session, redirect, url_for, render_template, request,flash
 
 from flask_login import login_user, logout_user, login_required, current_user
 from server import socketio, db
@@ -30,7 +30,7 @@ def sessions():
             uid = current_user.id
             userGroups = Member.query.filter_by(user_id=uid, group_id=groupid, pending=0)
             if userGroups.count() == 0:
-                return {'Error': 'User not authorized or Group not found'}
+                flash("User not authorized or Group not found")
             name = current_user.username
             room = group.groupname
             session['room'] = group.groupname
@@ -38,9 +38,9 @@ def sessions():
             session['user_id'] = current_user.id
             session['group_id'] = groupid
         else:
-            return {'Error': 'Unauthenticated'}
+            flash('Unauthenticated')
     else:
-        return {"Error": "Group not found"}
+         flash("Group not found")
     # result = Message.query.all()
     msgSorted = Message.query.filter_by(group_id=groupid).order_by(desc(Message.id)).limit(20)
     result = msgSorted.from_self().order_by(asc(Message.id))
