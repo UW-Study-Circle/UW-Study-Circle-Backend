@@ -55,3 +55,4 @@ def populate_data():
     User.query.all()
     Group.query.all()
 
+populate_data()
