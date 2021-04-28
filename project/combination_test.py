@@ -840,7 +840,7 @@ class MemberTestCase(unittest.TestCase):
     def test_put_members_into_joined_group(self):
        
 
-        res = self.client.put('/api/member/join/3')
+        res = self.client.put('/api/member/join/')
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual("Member already Exists", res.json['Error'])
@@ -863,7 +863,7 @@ class MemberTestCase(unittest.TestCase):
     def test_put_members_into_private_group(self):
       
 
-        res = self.client.put('/api/member/join/5')
+        res = self.client.put('/api/member/join/3')
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual("Member's Request Added. Waiting for Admin Approval", res.json['Success'])
