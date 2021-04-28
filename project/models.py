@@ -28,6 +28,18 @@ class Group(UserMixin, db.Model):
     status = db.Column(db.String(100))
     admin = db.Column(db.Integer) #userID of admin
 
+class Message(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(256))
+    user_name = db.Column(db.String(256))
+    group_id = db.Column(db.Integer)
+
+class MessageSchema(Schema):
+    id = fields.Int(dump_only=True)
+    message = fields.Str()
+    user_id = fields.Int()
+    group_id = fields.Int()
+
 class Member(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
