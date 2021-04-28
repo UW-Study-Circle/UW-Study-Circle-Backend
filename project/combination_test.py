@@ -638,6 +638,13 @@ class GroupTestCase(unittest.TestCase):
             db.drop_all()
 
 
+import unittest
+import json
+from server import app, db
+from populate_data import *
+
+
+
 class MemberTestCase(unittest.TestCase):
     """This class represents the group test case"""
 
@@ -773,7 +780,7 @@ class MemberTestCase(unittest.TestCase):
     def test_member_request_with_wrong_request_id(self):
         member = json.dumps({
                 "group_id": 1,
-                "request_id": 10,
+                "request_id": 15,
                 "approval": False
         })
         
@@ -785,7 +792,7 @@ class MemberTestCase(unittest.TestCase):
     def test_member_request_with__private_group_and_approved(self):
         member = json.dumps({
                 "group_id": 2,
-                "request_id": 8,
+                "request_id": 11,
                 "approval": True
         })
         
@@ -798,12 +805,12 @@ class MemberTestCase(unittest.TestCase):
     def test_member_request_with_private_group_and_not_approved(self):
         member = json.dumps({
                 "group_id": 2,
-                "request_id": 8,
+                "request_id": 11,
                 "approval": False
         })
         
         res = self.client.post('/api/member/request/',  headers={"Content-Type": "application/json"}, data=member)
-        # print("aaaaaaaaaaaaaaaaaaaaa", res.json)
+        print("aaaaaaaaaaaaaaaaaaaaa", res.json)
        
         self.assertEqual(res.status_code, 200)
        
@@ -846,7 +853,7 @@ class MemberTestCase(unittest.TestCase):
         self.assertEqual("Group does not exist", res.json['Error'])
         
     def test_put_members_into_public_group(self):
-        """Test API can access members by group id"""
+       
 
         res = self.client.put('/api/member/join/4')
         
@@ -854,7 +861,7 @@ class MemberTestCase(unittest.TestCase):
         self.assertEqual("Member Added", res.json['Success'])
         
     def test_put_members_into_private_group(self):
-        """Test API can access members by group id"""
+      
 
         res = self.client.put('/api/member/join/5')
         
@@ -867,6 +874,11 @@ class MemberTestCase(unittest.TestCase):
             # drop all tables
             db.session.remove()
             db.drop_all()
+        
+
+# Make the tests conveniently executable
+if __name__ == "__main__":
+    unittest.main()
 
 if __name__ == "__main__":
         unittest.main(verbosity = 2)
