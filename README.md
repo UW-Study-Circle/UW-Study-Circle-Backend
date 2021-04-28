@@ -37,3 +37,8 @@ app.app_context().push()
 User.query.all()
 Group.query.all()
 ```
+## Test Coverage
+```shell
+coverage run --branch combination_test.py
+```
+![coverage](https://user-images.githubusercontent.com/56054533/116451378-01f32b00-a822-11eb-91c0-6a9117532b6e.PNG)
