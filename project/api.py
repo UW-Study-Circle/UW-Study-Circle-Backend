@@ -192,16 +192,21 @@ class UserAPI(MethodResource, Resource):
         '''
         Delete method for User deletion
         '''
-        try:    
-            current_id = current_user.id
-            if int(id) != current_id:
-                return jsonify({"Error": "Incorrect User ID"})
-        except:
-            return jsonify({"Error": "Incorrect or Null ID"})
+        
         user = User.query.filter_by(id=id).first()
         result = dict()
-        if user is None:
-            return {"Content": "User not found"}
+        
+        
+        
+        try:    
+            current_id = current_user.id
+            if int(id) != current_id and user:
+                return jsonify({"Error": "Incorrect User ID"})
+            elif user is None:
+                return {"Content": "User not found"}
+        except:
+            return jsonify({"Error": "Incorrect or Null ID"})
+        
         from server import db
         db.session.delete(user)
         db.session.commit()

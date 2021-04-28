@@ -98,10 +98,28 @@ class UserAPITest(unittest.TestCase):
             )),
             content_type='application/json'
         )
-        # When logged in user tries to delete user doesn't exist
+        
+        payload2 = json.dumps({
+            "username": "wisc_user002", 
+            "password": "*Bucky_W1ns!",
+            "email": "bucky2@wisc.edu",
+            "lastname": "Badger",
+            "firstname": "Bucky",
+            "gender": "Male",
+            "phonenumber": "123456789",
+            "bday": "28-01-1995"
+        })
+        response = self.client.post('/api/user/', headers={"Content-Type": "application/json"}, data=payload2)
         response = self.client.delete('/api/user/id/2', headers={"Content-Type": "application/json"})
-        # Then
         self.assertTrue(response.json['Error'] == "Incorrect User ID")
+        # Then
+        self.assertEqual(200, response.status_code)
+        
+        
+        # When logged in user tries to delete user doesn't exist
+        response = self.client.delete('/api/user/id/3', headers={"Content-Type": "application/json"})
+        # Then
+        self.assertTrue(response.json['Content'] == "User not found")
         self.assertEqual(200, response.status_code)
 
         # When passing invalid input like null
@@ -700,16 +718,16 @@ class MemberTestCase(unittest.TestCase):
        
         self.assertEqual("[]", str(res.json))
         
-#     def test_get_groups_without_user_id(self):
-#         """Test API can access group info without user id"""
+    # def test_get_groups_without_user_id(self):
+    #     """Test API can access group info without user id"""
  
-#         res = self.client.get('/api/member/groups')
+    #     res = self.client.get('/api/member/groups')
         
-#         self.assertEqual(res.status_code, 404)
+    #     self.assertEqual(res.status_code, 404)
        
-#         print("zzzzzzzzzzzzzzzzzzzzzzzz", res.json)
-#         self.assertEqual(1, res.json[0][id])
-#         self.assertEqual(4, res.json[1][id])
+    #     print("zzzzzzzzzzzzzzzzzzzzzzzz", res.json)
+    #     self.assertEqual(1, res.json[0][id])
+    #     self.assertEqual(4, res.json[1][id])
 
     def test_get_groups_by_user_id(self):
         """Test API can access group info by logged user"""
@@ -730,7 +748,7 @@ class MemberTestCase(unittest.TestCase):
     def test_member_request_with_none_existing_group(self):
         
         member = json.dumps({
-                "group_id": 5,
+                "group_id": 8,
                 "request_id": 1,
                 "approval": False
             })
@@ -766,8 +784,8 @@ class MemberTestCase(unittest.TestCase):
         
     def test_member_request_with__private_group_and_approved(self):
         member = json.dumps({
-                "group_id": 1,
-                "request_id": 4,
+                "group_id": 2,
+                "request_id": 8,
                 "approval": True
         })
         
@@ -779,12 +797,13 @@ class MemberTestCase(unittest.TestCase):
 
     def test_member_request_with_private_group_and_not_approved(self):
         member = json.dumps({
-                "group_id": 1,
-                "request_id": 4,
+                "group_id": 2,
+                "request_id": 8,
                 "approval": False
         })
         
         res = self.client.post('/api/member/request/',  headers={"Content-Type": "application/json"}, data=member)
+        # print("aaaaaaaaaaaaaaaaaaaaa", res.json)
        
         self.assertEqual(res.status_code, 200)
        
@@ -800,20 +819,27 @@ class MemberTestCase(unittest.TestCase):
         res = self.client.post('/api/member/request/',  headers={"Content-Type": "application/json"}, data=member)
        
         self.assertEqual(res.status_code, 200)
-        print("aaaaaaaaaaaaaaaaaaaaa",res.json)
+        # print("aaaaaaaaaaaaaaaaaaaaa",res.json)
         self.assertIn("No change in request", res.json['Status'])
-
-    def test_put_members_into_joined_group(self):
-        """Test API can access members by group id"""
+        
+    def test_put_admin_into_joined_group(self):
+       
 
         res = self.client.put('/api/member/join/1')
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual("Admin already member of the group", res.json['Error'])
+
+    def test_put_members_into_joined_group(self):
+       
+
+        res = self.client.put('/api/member/join/3')
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual("Member already Exists", res.json['Error'])
         
     def test_put_members_with_notexisting_group_id(self):
-        
-        """Test API can access members by wrong group id"""
+      
         res = self.client.put('/api/member/join/8')
         self.assertEqual(res.status_code, 200)
       
@@ -830,7 +856,7 @@ class MemberTestCase(unittest.TestCase):
     def test_put_members_into_private_group(self):
         """Test API can access members by group id"""
 
-        res = self.client.put('/api/member/join/3')
+        res = self.client.put('/api/member/join/5')
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual("Member's Request Added. Waiting for Admin Approval", res.json['Success'])
