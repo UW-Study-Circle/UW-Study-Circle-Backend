@@ -79,6 +79,7 @@ api.add_resource(UserAPI, '/api/user/id/<id>', endpoint="delete_user", methods=[
 api.add_resource(GroupAPI, '/api/group/', endpoint="create_group", methods=['POST'])
 api.add_resource(GroupAPI, '/api/group/', endpoint="search_group", methods=['GET'])
 api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="get_group_id", methods=['GET'])
+api.add_resource(GroupAPI, '/api/group/id/<id>', endpoint="group_settings", methods=['PUT'])
 api.add_resource(GroupAPI, '/api/group/<search>', endpoint="search_group_query", methods=['GET'])
 api.add_resource(GroupAPI, '/api/group/id/<groupid>', endpoint="delete_group", methods=['DELETE'])
 
@@ -106,6 +107,7 @@ docs.register(UserAPI, endpoint="delete_user", blueprint="api")
 docs.register(GroupAPI, endpoint="create_group", blueprint="api")
 docs.register(GroupAPI, endpoint="search_group", blueprint="api")
 docs.register(GroupAPI, endpoint="get_group_id", blueprint="api")
+docs.register(GroupAPI, endpoint="group_settings", blueprint="api")
 docs.register(GroupAPI, endpoint="search_group_query", blueprint="api")
 docs.register(GroupAPI, endpoint="delete_group", blueprint="api")
 

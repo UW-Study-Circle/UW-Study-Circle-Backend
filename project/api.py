@@ -214,6 +214,40 @@ class UserAPI(MethodResource, Resource):
         return jsonify(result)
 
 class GroupAPI(MethodResource, Resource):
+    @login_required
+    @doc(description='Put request for group description change.', tags=['Group'])    
+    @use_kwargs(GroupSettingsSchema)
+    def put(self, **kwargs):
+        try:
+            user = current_user
+            body = request.get_json()
+            groupid = kwargs["id"]
+            result = dict()
+            if body is None:
+                return jsonify({"Error": "Data not in correct format"})
+            new_description = body["new_description"]
+            print(new_description, groupid)
+
+            group = Group.query.filter_by(id=groupid).first()
+            if group is None:
+                return {"Failure": "Group not found"}
+
+            if group.admin != user.id:
+                result["Failure"] = "User not admin."
+                return jsonify(result)
+
+            if group.description == new_description:
+                result["Failure"] = "No change in description."
+                return jsonify(result)
+
+            group.description = new_description          
+            result["Success"] = "New Description set successfully!"
+            from server import db
+            db.session.commit()
+            return jsonify(result)
+        except Exception as e:
+            return jsonify({"Error": str(e)})
+
     @doc(description='Post request for group creation feature.', tags=['Group'])
     @use_kwargs(GroupSchema)
     @login_required

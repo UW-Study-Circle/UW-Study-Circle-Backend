@@ -57,6 +57,9 @@ class MemberApprovalSchema(Schema):
     group_id = fields.Int()
     approval = fields.Bool()
 
+class GroupSettingsSchema(Schema):
+    new_description = fields.Str()
+
 class ResetPasswordSchema(Schema):
     cpwd = fields.Str()
     npwd = fields.Str()
