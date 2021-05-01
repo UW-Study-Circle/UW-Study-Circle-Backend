@@ -41,4 +41,5 @@ Group.query.all()
 ```shell
 coverage run --branch combination_test.py
 ```
-![coverage](https://user-images.githubusercontent.com/56054533/116451378-01f32b00-a822-11eb-91c0-6a9117532b6e.PNG)
+![coverage](https://user-images.githubusercontent.com/56054533/116767431-b2fdef00-a9f5-11eb-8b75-b9ac3b20998a.PNG)
+
