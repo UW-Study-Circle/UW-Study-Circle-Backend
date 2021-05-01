@@ -32,8 +32,8 @@ def sessions():
             uid = current_user.id
             userGroups = Member.query.filter_by(user_id=uid, group_id=groupid, pending=0)
             if userGroups.count() == 0:
-                flash("Member not existed.")
-                return redirect(url_for('chat.sessions'))
+                flash("Group does not exist or user not part of the group.")
+                # return redirect(url_for('chat.sessions'))
             name = current_user.username
             room = group.groupname
             session['room'] = group.groupname
@@ -44,7 +44,7 @@ def sessions():
             flash('Unauthenticated')
     else:
          flash("Group not found")
-         return redirect(url_for('chat.sessions'))
+        #  return redirect(url_for('chat.sessions'))
     # result = Message.query.all()
     msgSorted = Message.query.filter_by(group_id=groupid).order_by(desc(Message.id)).limit(20)
     result = msgSorted.from_self().order_by(asc(Message.id))
