@@ -22,7 +22,9 @@ def sessions():
     the session."""
     print(request.args.to_dict(flat=False))
     groupid = request.args.get('groupid')
+    # print(groupid, "ddddddddddddddddddddd")
     group = Group.query.get(groupid)
+    # print(group, "aaaaaaaaaaaaaaaaaaaaaaaa")
     name = ""
     room = ""
     if group:
@@ -30,7 +32,8 @@ def sessions():
             uid = current_user.id
             userGroups = Member.query.filter_by(user_id=uid, group_id=groupid, pending=0)
             if userGroups.count() == 0:
-                flash("Member not existed.")
+                flash("Group does not exist or user not part of the group.")
+                # return redirect(url_for('chat.sessions'))
             name = current_user.username
             room = group.groupname
             session['room'] = group.groupname
