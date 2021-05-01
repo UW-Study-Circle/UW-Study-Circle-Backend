@@ -6,7 +6,7 @@ from populate_data import *
 
 
 class MemberTestCase(unittest.TestCase):
-    """This class represents the group test case"""
+    """This class represents the member test case"""
 
     def setUp(self):
         """Define test variables and initialize app."""

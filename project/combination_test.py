@@ -393,6 +393,8 @@ class GroupTestCase(unittest.TestCase):
         app.config['TESTING'] = True
         with app.app_context():
             # create all tables
+            db.session.remove()
+            db.drop_all()
             db.create_all()
         
 
@@ -428,6 +430,17 @@ class GroupTestCase(unittest.TestCase):
                 "bday": "28-01-1995"
         })
         
+        self.new_user2 = json.dumps({
+                "username": "wisc_user003", 
+                "password": "aaaa",
+                "email": "a@e.c",
+                "lastname": "Badger",
+                "firstname": "Bucky",
+                "gender": "Male",
+                "phonenumber": "123456789",
+                "bday": "28-01-1995"
+        })
+        
         self.login_user = json.dumps({
                 "email": "bucky_diff@wisc.edu",
                 "password": "*Bucky_W1ns!"
@@ -436,6 +449,7 @@ class GroupTestCase(unittest.TestCase):
         
         
         response = self.client.post('/api/user/', headers={"Content-Type": "application/json"}, data=self.new_user)
+        response = self.client.post('/api/user/', headers={"Content-Type": "application/json"}, data=self.new_user2)
         
         response = self.client.post('/api/login/' , headers={"Content-Type": "application/json"}, data=self.login_user)
         
@@ -628,7 +642,78 @@ class GroupTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIn("Not admin", rm.json['Error'])
         
+    def test_put_not_conect_data_type(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        res = self.client.put('/api/group/id/1',  headers={"Content-Type": "text/plain"}, data="1234")
+       
+        self.assertEqual(res.status_code, 200)
+        # print("eeeeeeeeeeeeeeeeeeeeeee", res.json)
+        self.assertIn("Data not in correct format", res.json['Error'])
+    
+    def test_put_nonexisting_group_id(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        body = json.dumps({
+                
+                "new_description": "computer science"
+        })
         
+        res = self.client.put('/api/group/id/2',  headers={"Content-Type": "application/json"}, data=body)
+       
+        self.assertEqual(res.status_code, 200) 
+        self.assertIn("Group not found", res.json['Failure']) 
+        
+    def test_put_success(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        body = json.dumps({
+                
+                "new_description": "computer science"
+        })
+        
+        res = self.client.put('/api/group/id/1',  headers={"Content-Type": "application/json"}, data=body)
+       
+        self.assertEqual(res.status_code, 200)
+        
+        self.assertIn("New Description set successfully!", res.json['Success'])  
+        
+    def test_put_change_by_not_admin(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        body = json.dumps({
+                
+                "new_description": "computer science"
+        })
+        
+        response = self.client.get('/api/logout/true',content_type='application/json')
+        response = self.client.post(
+            '/api/login/',
+            data=json.dumps(dict(
+                email='a@e.c',
+                password='aaaa'
+            )),
+            content_type='application/json'
+        )
+        res = self.client.put('/api/member/join/1')
+        
+        res = self.client.put('/api/group/id/1',  headers={"Content-Type": "application/json"}, data=body)
+       
+       
+        self.assertEqual(res.status_code, 200)
+        
+        self.assertIn("User not admin.", res.json['Failure'])  
+        
+    def test_put_no_change_for_description(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        body = json.dumps({        
+                "new_description": "Software Engineering is a course that closely resembles the real-world. Over the course of the semester I will serve as your pilot on a 30,000 ft above sea-level tour of most things software engineering. I will take a breadth-first approach to covering the software engineering process from requirements gathering to project completion."
+        })
+        
+       
+        
+        res = self.client.put('/api/group/id/1',  headers={"Content-Type": "application/json"}, data=body)
+       
+        self.assertEqual(res.status_code, 200)
+        
+        self.assertIn("No change in description.", res.json['Failure'])  
+   
 
     def tearDown(self):
         """teardown all initialized variables."""
@@ -879,6 +964,96 @@ class MemberTestCase(unittest.TestCase):
         self.assertEqual("Member's Request Added. Waiting for Admin Approval", res.json['Success'])
            
     def tearDown(self): 
+        """teardown all initialized variables."""
+        with app.app_context():
+            # drop all tables
+            db.session.remove()
+            db.drop_all()
+            
+class ChatTestCase(unittest.TestCase):
+    """This class represents the chat test case"""
+
+    def setUp(self):
+        """Define test variables and initialize app."""
+        # self.app = create_app(config_name="testing")
+        # app.config['LOGIN_DISABLED'] = True
+        self.client = app.test_client()
+        app.config['TESTING'] = True
+        with app.app_context():
+            # create all tables
+            db.create_all()
+        
+
+        populate_data()
+        
+        self.login_user = json.dumps({
+                "email": "a@e.c",
+                "password": "aaaa"
+                
+        })
+        
+        response = self.client.post('/api/login/' , headers={"Content-Type": "application/json"}, data=self.login_user)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.headers['Set-Cookie'])
+        
+    def test_auth(self):
+        """Test API can't be accessible withou authority."""
+        logout = self.client.get('/api/logout/True')
+        res = self.client.post('/chat', query_string={'groupid': 1})
+        print(res.status_code, res.json)
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(res.json, None)
+        
+    
+    def test_post_message_with_a_group_id(self):
+
+        res = self.client.post('/chat', query_string={'groupid': 2})
+        # print(response.status_code, response.json)
+        self.assertEqual(res.status_code, 200)
+        res = self.client.get('/chat')
+        with self.client.session_transaction() as session:
+            try:
+                self.assertEqual(session['room'], 'Assembly Language Group')
+                self.assertEqual(session['name'], 'akshat')
+                self.assertEqual(session['user_id'], 1)
+                self.assertEqual(session['group_id'], '2')
+            except KeyError:
+                raise AssertionError('nothing flashed')
+      
+        
+    def test_post_message_in_unvalid_group(self):
+        
+        response = self.client.post('/chat', query_string={'groupid': 10})
+        response = self.client.get('/chat')
+        # assert "_flashes" in session
+        with self.client.session_transaction() as session:
+            try:
+                print(session)
+                category, message = session['_flashes'][0]
+            except KeyError:
+                raise AssertionError('nothing flashed')
+            assert "Group not found" in message
+            self.assertEqual(category, 'message')
+            
+            
+    def test_post_message_not_a_member(self):
+   
+        response = self.client.post('/chat', query_string={'groupid': 4})
+        print(response)
+        response = self.client.get('/chat')
+        # assert "_flashes" in session
+        with self.client.session_transaction() as session:
+            try:
+                print(session)
+                category, message = session['_flashes'][0]
+            except KeyError:
+                raise AssertionError('nothing flashed')
+            assert "Member not existed." in message
+            self.assertEqual(category, 'message')
+    
+    
+    def tearDown(self):
         """teardown all initialized variables."""
         with app.app_context():
             # drop all tables
