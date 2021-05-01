@@ -221,6 +221,7 @@ class GroupAPI(MethodResource, Resource):
         try:
             user = current_user
             body = request.get_json()
+            # print("body", body)
             groupid = kwargs["id"]
             result = dict()
             if body is None:

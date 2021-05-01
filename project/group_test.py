@@ -14,6 +14,8 @@ class GroupTestCase(unittest.TestCase):
         app.config['TESTING'] = True
         with app.app_context():
             # create all tables
+            db.session.remove()
+            db.drop_all()
             db.create_all()
         
 
@@ -49,6 +51,17 @@ class GroupTestCase(unittest.TestCase):
                 "bday": "28-01-1995"
         })
         
+        self.new_user2 = json.dumps({
+                "username": "wisc_user003", 
+                "password": "aaaa",
+                "email": "a@e.c",
+                "lastname": "Badger",
+                "firstname": "Bucky",
+                "gender": "Male",
+                "phonenumber": "123456789",
+                "bday": "28-01-1995"
+        })
+        
         self.login_user = json.dumps({
                 "email": "bucky_diff@wisc.edu",
                 "password": "*Bucky_W1ns!"
@@ -57,6 +70,7 @@ class GroupTestCase(unittest.TestCase):
         
         
         response = self.client.post('/api/user/', headers={"Content-Type": "application/json"}, data=self.new_user)
+        response = self.client.post('/api/user/', headers={"Content-Type": "application/json"}, data=self.new_user2)
         
         response = self.client.post('/api/login/' , headers={"Content-Type": "application/json"}, data=self.login_user)
         
@@ -249,7 +263,78 @@ class GroupTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIn("Not admin", rm.json['Error'])
         
+    def test_put_not_conect_data_type(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        res = self.client.put('/api/group/id/1',  headers={"Content-Type": "text/plain"}, data="1234")
+       
+        self.assertEqual(res.status_code, 200)
+        # print("eeeeeeeeeeeeeeeeeeeeeee", res.json)
+        self.assertIn("Data not in correct format", res.json['Error'])
+    
+    def test_put_nonexisting_group_id(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        body = json.dumps({
+                
+                "new_description": "computer science"
+        })
         
+        res = self.client.put('/api/group/id/2',  headers={"Content-Type": "application/json"}, data=body)
+       
+        self.assertEqual(res.status_code, 200) 
+        self.assertIn("Group not found", res.json['Failure']) 
+        
+    def test_put_success(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        body = json.dumps({
+                
+                "new_description": "computer science"
+        })
+        
+        res = self.client.put('/api/group/id/1',  headers={"Content-Type": "application/json"}, data=body)
+       
+        self.assertEqual(res.status_code, 200)
+        
+        self.assertIn("New Description set successfully!", res.json['Success'])  
+        
+    def test_put_change_by_not_admin(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        body = json.dumps({
+                
+                "new_description": "computer science"
+        })
+        
+        response = self.client.get('/api/logout/true',content_type='application/json')
+        response = self.client.post(
+            '/api/login/',
+            data=json.dumps(dict(
+                email='a@e.c',
+                password='aaaa'
+            )),
+            content_type='application/json'
+        )
+        res = self.client.put('/api/member/join/1')
+        
+        res = self.client.put('/api/group/id/1',  headers={"Content-Type": "application/json"}, data=body)
+       
+       
+        self.assertEqual(res.status_code, 200)
+        
+        self.assertIn("User not admin.", res.json['Failure'])  
+        
+    def test_put_no_change_for_description(self):
+        res = self.client.post('/api/group/', headers={"Content-Type": "application/json"}, data=self.group)
+        body = json.dumps({        
+                "new_description": "Software Engineering is a course that closely resembles the real-world. Over the course of the semester I will serve as your pilot on a 30,000 ft above sea-level tour of most things software engineering. I will take a breadth-first approach to covering the software engineering process from requirements gathering to project completion."
+        })
+        
+       
+        
+        res = self.client.put('/api/group/id/1',  headers={"Content-Type": "application/json"}, data=body)
+       
+        self.assertEqual(res.status_code, 200)
+        
+        self.assertIn("No change in description.", res.json['Failure'])  
+   
 
     def tearDown(self):
         """teardown all initialized variables."""

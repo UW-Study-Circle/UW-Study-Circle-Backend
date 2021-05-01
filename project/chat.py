@@ -20,9 +20,11 @@ chat = Blueprint('chat', __name__)
 def sessions():
     """Chat room. The user's name and room must be stored in
     the session."""
+    print(request.args.to_dict(flat=False))
     groupid = request.args.get('groupid')
-
+    # print(groupid, "ddddddddddddddddddddd")
     group = Group.query.get(groupid)
+    # print(group, "aaaaaaaaaaaaaaaaaaaaaaaa")
     name = ""
     room = ""
     if group:
@@ -30,7 +32,8 @@ def sessions():
             uid = current_user.id
             userGroups = Member.query.filter_by(user_id=uid, group_id=groupid, pending=0)
             if userGroups.count() == 0:
-                flash("User not authorized or Group not found")
+                flash("Member not existed.")
+                return redirect(url_for('chat.sessions'))
             name = current_user.username
             room = group.groupname
             session['room'] = group.groupname
@@ -41,6 +44,7 @@ def sessions():
             flash('Unauthenticated')
     else:
          flash("Group not found")
+         return redirect(url_for('chat.sessions'))
     # result = Message.query.all()
     msgSorted = Message.query.filter_by(group_id=groupid).order_by(desc(Message.id)).limit(20)
     result = msgSorted.from_self().order_by(asc(Message.id))
